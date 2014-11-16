@@ -1,0 +1,33 @@
+20 20
+Examples/BeachStones
+
+Objects
+b Barrel.mesh 3.5 0.0 1
+
+Characters
+m fish.mesh 3.0 2.0
+n ninja.mesh 3.0 0.2
+r robot.mesh 3.0 0.4
+
+World
+oooooooooooooooooooo
+oooooooooooooooooooo
+oooooooooooooooooooo
+oooooooooooooooooooo
+oooooooooooooooooooo
+oooooooooooooooooooo
+oooooooooooooooooooo
+oooooooooooooooooooo
+ooooooorooonoooooooo
+oooooooooooooooooooo
+oooooooooooooooooooo
+oooooooooooooooooooo
+oooooooooooooooooooo
+oooooooooooooooooooo
+oooooooooooooooooooo
+oooooooooooooooooooo
+oooooooooooooooooooo
+oooooooooooooooooooo
+oooooooooooooooooooo
+oooooooooooooooooooo
+
