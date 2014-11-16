@@ -12,13 +12,40 @@ Robot::Robot(Ogre::SceneManager* SceneManager, std::string name, std::string fil
 	{
 		Ogre::AnimationState *a = iter.getNext();
 	}
-	
+	counter = 0;
+	testing = 0;
 	setupAnimations();
 }
 
 void Robot::update(Ogre::Real deltaTime){
 	this->updateAnimations(deltaTime);	// Update animation playback
 	this->updateLocomote(deltaTime);	// Update Locomotion
+	/*counter++;
+	if (counter > 100){
+		counter = counter % 100;
+		testing++;
+		if (testing > 5){
+			testing = 0;
+		}
+		if(testing == 0){
+			setAnimation(DIE);
+		}
+		if(testing == 1){
+			setAnimation(IDLE);
+		}
+		if(testing == 2){
+			setAnimation(SHOOT);
+		}
+		if(testing == 3){
+			setAnimation(SLUMP);
+		}
+		if(testing == 4){
+			setAnimation(WALK);
+		}
+		if(testing == 5){
+			setAnimation(ANIM_NONE);
+		}
+	}*/
 }
 
 void Robot::updateLocomote(Ogre::Real deltaTime){
@@ -97,13 +124,18 @@ void Robot::setupAnimations(){
 	for (int i = 0; i < 5; i++)
 	{
 		mAnims[i] = mBodyEntity->getAnimationState(animNames[i]);
-		mAnims[i]->setLoop(true);
+		if(i == 0 || i==3){
+			mAnims[i]->setLoop(false);
+		}
+		else{
+			mAnims[i]->setLoop(true);
+		}
 		mFadingIn[i] = false;
 		mFadingOut[i] = false;
 	}
 
 	// start off in the idle state (top and bottom together)
-	setAnimation(DIE);
+	setAnimation(WALK);
 }
 
 void Robot::setAnimation(AnimID id, bool reset){
