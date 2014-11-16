@@ -352,9 +352,11 @@ GameApplication::keyPressed( const OIS::KeyEvent &arg ) // Moved from BaseApplic
     }
 	else if (arg.key == OIS::KC_SPACE)
 	{
-		yoshPointer->changeSpeed(.6);  //jump should be slower
-		yoshPointer->buttonAnimation('j');
-		yoshPointer->doingStuff = true;
+		if(!yoshPointer->doingStuff){
+			yoshPointer->changeSpeed(.6);  //jump should be slower
+			yoshPointer->buttonAnimation('j');
+			yoshPointer->doingStuff = true;
+		}
 	}
 	else if (arg.key == OIS::KC_W) {
 		
