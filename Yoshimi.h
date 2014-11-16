@@ -17,15 +17,16 @@ public:
 	void setMovement(char dir, bool on); //set the movemnt
 	void rotationCode(OIS::MouseEvent arg);  //Rotate the hero when we move the mouse
 	void buttonAnimation(char pressed);		//tell me what animation to do
-	bool getAnimation();					//are you currently executing an animation?
+											//are you currently executing an animation?
 
 	bool doingStuff;		//if Yoshimi is currently doing a non-looping animation
-
+	void changeSpeed(double s) { speed = s; }	//change the speed for different animations
 private:
 	bool fForward; //how am I moving? Each flag indicates a direction
 	bool fBackward;
 	bool fRight;
 	bool fLeft;
+	double speed;	//how fast to move
 
 	enum AnimID
 	{

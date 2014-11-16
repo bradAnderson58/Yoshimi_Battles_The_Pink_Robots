@@ -15,7 +15,8 @@ Yoshimi::Yoshimi(Ogre::SceneManager* SceneManager, std::string name, std::string
 	fForward = fBackward = fRight = fLeft = false;  //starts by not moving
 
 	doingStuff = false;  //starts not doing anything
-	
+	speed = 2;	//Yoshimi a quick one 
+
 	mBodyNode->showBoundingBox(true);  //for testing purposes
 	//Get them animations brah
 	/*Ogre::AnimationStateSet* aSet = mBodyEntity->getAllAnimationStates();
@@ -37,7 +38,7 @@ void Yoshimi::update(Ogre::Real deltaTime){
 
 void Yoshimi::updateLocomote(Ogre::Real deltaTime){
 	Ogre::Quaternion q;
-	double speed = 0.2;  //how fast is Yoshimi?
+	double vel = 0.2;
 	Ogre::Vector3 translator = Ogre::Vector3::ZERO;
 
 	//use direction for forward and backward
@@ -47,12 +48,13 @@ void Yoshimi::updateLocomote(Ogre::Real deltaTime){
 	q.FromAngleAxis(Ogre::Radian(M_PI) / 2, Ogre::Vector3(0,1,0));
 	Ogre::Vector3 side = q*mDirection;
 
-	//set translation based on which keys are currentl 
-	if (fForward) translator += (mDirection * -speed);
-	if (fLeft) translator += (side * -speed);
-	if (fRight) translator += (side * speed);
-	if (fBackward) translator += (mDirection * speed);
-
+	//set translation based on which keys are currentl
+	if (!doingStuff || yoshAnim == JUMP){
+		if (fForward) translator += (mDirection * -vel);
+		if (fLeft) translator += (side * -vel);
+		if (fRight) translator += (side * vel);
+		if (fBackward) translator += (mDirection * vel);
+	}
 	//Set Yoshimi Animation based on movement (if not already doing stuff)
 	if (!doingStuff){
 		if (!fForward && !fLeft && !fRight && !fBackward){
@@ -83,8 +85,11 @@ void Yoshimi::updateAnimations(Ogre::Real deltaTime){
 
 	//If Yoshimi has an active animation, call the update method
 	if (yoshAnim != ANIM_NONE){
-		mAnims[yoshAnim]->addTime(deltaTime * 2);
-		if (mAnims[yoshAnim]->hasEnded()) doingStuff = false;   //no longer doing stuff
+		mAnims[yoshAnim]->addTime(deltaTime * speed);
+		if (mAnims[yoshAnim]->hasEnded()){
+			doingStuff = false;   //no longer doing stuff
+			speed = 2;
+		}
 	}
 	//transitions
 	fadeAnimations(deltaTime);
