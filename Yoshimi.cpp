@@ -8,17 +8,18 @@ Yoshimi::Yoshimi(Ogre::SceneManager* SceneManager, std::string name, std::string
 {
 	mBodyNode->attachObject(app->getCamera());	// main character has camera attached ! ?
 	fForward = fBackward = fRight = fLeft = false;  //starts by not moving
-	Ogre::AnimationStateSet* aSet = mBodyEntity->getAllAnimationStates();
+	
+	//Get them animations brah
+	/*Ogre::AnimationStateSet* aSet = mBodyEntity->getAllAnimationStates();
 	Ogre::AnimationStateIterator iter = mBodyEntity->getAllAnimationStates()->getAnimationStateIterator();
 	while (iter.hasMoreElements())
 	{
 		Ogre::AnimationState *a = iter.getNext();
 		std::string s = a->getAnimationName();
 		std::cout << s << std::endl;
-	}
+	}*/
 	
 	setupAnimations();
-	//yoshAnim = ANIM_NONE;
 }
 
 void Yoshimi::update(Ogre::Real deltaTime){
@@ -44,6 +45,12 @@ void Yoshimi::updateLocomote(Ogre::Real deltaTime){
 	if (fRight) translator += (side * speed);
 	if (fBackward) translator += (mDirection * speed);
 
+	//Set Yoshimi Animation based on movement
+	if (!fForward && !fLeft && !fRight && !fBackward){
+		if (yoshAnim != IDLE_THREE) setAnimation(IDLE_THREE);
+	}else{
+		if (yoshAnim != STEALTH) setAnimation(STEALTH);
+	}
 	mBodyNode->translate(translator);
 }
 
@@ -58,38 +65,26 @@ void Yoshimi::setMovement(char dir, bool on){
 }
 
 void Yoshimi::rotationCode(OIS::MouseEvent arg){
-	mBodyNode->yaw(Ogre::Degree(arg.state.X.rel * -0.1f));
+	mBodyNode->yaw(Ogre::Degree(arg.state.X.rel * -0.5f));
     //mBodyNode->pitch(Ogre::Degree(arg.state.Y.rel * -0.1f));
 }
 
 void Yoshimi::updateAnimations(Ogre::Real deltaTime){
-	std::cout << yoshAnim << std::endl;
 
-
-	mTimer += deltaTime; // how much time has passed since the last update
-
-	if (yoshAnim != ANIM_IDLE_TOP)
-	if (yoshAnim != ANIM_NONE)
-	if (mTimer >= mAnims[yoshAnim]->getLength())
-		{
-			//setTopAnimation(ANIM_IDLE_TOP, true);
-			//setBaseAnimation(ANIM_IDLE_BASE, true);
-			mTimer = 0;
-		}
-
+	//If Yoshimi has an active animation, call the update method
 	if (yoshAnim != ANIM_NONE){
-		mAnims[yoshAnim]->addTime(deltaTime * 1);
-		std::cout << "Here?" << std::endl;
+		mAnims[yoshAnim]->addTime(deltaTime * .5);
+		
 	}
 	//transitions
-	//fadeAnimations(deltaTime);
+	fadeAnimations(deltaTime);
 	
 }
 
 void Yoshimi::fadeAnimations(Ogre::Real deltaTime){
 	using namespace Ogre;
 
-	for (int i = 0; i < 13; i++)
+	for (int i = 0; i < 20; i++)
 	{
 		if (mFadingIn[i])
 		{
@@ -138,9 +133,6 @@ void Yoshimi::setupAnimations(){
 	// start off in the idle state (top and bottom together)
 	setAnimation(IDLE_TWO);
 
-	/*Ogre::AnimationState* thing = mBodyEntity->getAnimationState("Idle2");
-	thing->setLoop(true);
-	thing->setEnabled(true);*/
 }
 
 void Yoshimi::setAnimation(AnimID id, bool reset){
@@ -157,9 +149,9 @@ void Yoshimi::setAnimation(AnimID id, bool reset){
 	{
 		// if we have a new animation, enable it and fade it in
 		mAnims[id]->setEnabled(true);
-		//mAnims[id]->setWeight(0);
-		//mFadingOut[id] = false;
-		//mFadingIn[id] = true;
-		//if (reset) mAnims[id]->setTimePosition(0);
+		mAnims[id]->setWeight(0);
+		mFadingOut[id] = false;
+		mFadingIn[id] = true;
+		if (reset) mAnims[id]->setTimePosition(0);
 	}
 }
