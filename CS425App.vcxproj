@@ -92,6 +92,7 @@
     <ClInclude Include="BaseApplication.h" />
     <ClInclude Include="GameApplication.h" />
     <ClInclude Include="Grid.h" />
+    <ClInclude Include="Robot.h" />
     <ClInclude Include="Yoshimi.h" />
   </ItemGroup>
   <ItemGroup>
@@ -100,6 +101,7 @@
     <ClCompile Include="GameApplication.cpp" />
     <ClCompile Include="Grid.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Robot.cpp" />
     <ClCompile Include="Yoshimi.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

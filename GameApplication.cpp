@@ -159,7 +159,7 @@ GameApplication::loadEnv()
 						agent = new Yoshimi(this->mSceneMgr, getNewName(), rent->filename, rent->y, rent->scale, this);
 						yoshPointer = (Yoshimi*) agent;  //you are a yoshimi
 					}else {
-						agent = new Agent(this->mSceneMgr, getNewName(), rent->filename, rent->y, rent->scale, this);
+						agent = new Robot(this->mSceneMgr, getNewName(), rent->filename, rent->y, rent->scale, this);
 						agentList.push_back(agent);
 					}
 					//agent->setApp(this);  //in constructor

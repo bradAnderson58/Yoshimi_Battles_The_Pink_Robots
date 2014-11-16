@@ -4,6 +4,7 @@
 #include "BaseApplication.h"
 #include "Agent.h"
 #include "Yoshimi.h"
+#include "Robot.h"
 
 
 class GameApplication : public BaseApplication
