@@ -341,7 +341,8 @@ GameApplication::keyPressed( const OIS::KeyEvent &arg ) // Moved from BaseApplic
     }
 	else if (arg.key == OIS::KC_SPACE)
 	{
-		//Jump
+		yoshPointer->buttonAnimation('j');
+		yoshPointer->doingStuff = true;
 	}
 	else if (arg.key == OIS::KC_W) {
 		
@@ -356,6 +357,11 @@ GameApplication::keyPressed( const OIS::KeyEvent &arg ) // Moved from BaseApplic
 	}
 	else if (arg.key == OIS::KC_S) {
 		yoshPointer->setMovement('b', true);
+	}
+	//Some wicked attacks
+	else if (arg.key == OIS::KC_Q){
+		yoshPointer->buttonAnimation('t');
+		yoshPointer->doingStuff = true;
 	}
    
     //mCameraMan->injectKeyDown(arg);
@@ -389,55 +395,20 @@ bool GameApplication::mouseMoved( const OIS::MouseEvent &arg )
 bool GameApplication::mousePressed( const OIS::MouseEvent &arg, OIS::MouseButtonID id )
 {
 	//////////////////////////////////////////////////////////////////////////////////////
-	// Lecture 12
+	// attack using left and right mouse buttons
 	if(id == OIS::MB_Left)
 	{
-		//show that the current object has been deselected by removing the bounding box visual
-		if(mCurrentObject)
-		{
-			mCurrentObject->showBoundingBox(false);
-		}
- 
-		//find the current mouse position
-		Ogre::Vector3 mousePos;
-		mousePos.x = arg.state.X.abs;
-		mousePos.y = arg.state.Y.abs;
-		mousePos.z = arg.state.Z.abs;
-		
- 
-		//then send a raycast straight out from the camera at the mouse's position
-		Ogre::Ray mouseRay = mCamera->getCameraToViewportRay(mousePos.x/float(arg.state.width), mousePos.y/float(arg.state.height));
-		mRayScnQuery->setRay(mouseRay);
-		mRayScnQuery->setSortByDistance(true);
-		
-		/* This next chunk finds the results of the raycast */
-		Ogre::RaySceneQueryResult& result = mRayScnQuery->execute();
-		Ogre::RaySceneQueryResult::iterator iter = result.begin();
- 
-		for(iter; iter != result.end(); iter++)
-		{
-			if(iter->movable && iter->movable->getName().substr(0, 5) != "tile[")
-			{
-				mCurrentObject = iter->movable->getParentSceneNode();
-				break;
-			}
-		}
- 
-		//now we show the bounding box so the user can see that this object is selected
-		if(mCurrentObject)
-		{
-			mCurrentObject->showBoundingBox(true);
-		}
- 
-		bLMouseDown = true;
+		yoshPointer->buttonAnimation('s');
+		yoshPointer->doingStuff = true;
 	}
-	else if (id == OIS::MB_Right)
-		bRMouseDown = true;
-
+	else if (id == OIS::MB_Right){
+		yoshPointer->buttonAnimation('k');
+		yoshPointer->doingStuff = true;
+	}
 	//////////////////////////////////////////////////////////////////////////////////////
    
-    if (mTrayMgr->injectMouseDown(arg, id)) return true;
-    mCameraMan->injectMouseDown(arg, id);
+    //if (mTrayMgr->injectMouseDown(arg, id)) return true;
+    //mCameraMan->injectMouseDown(arg, id);
     return true;
 }
 

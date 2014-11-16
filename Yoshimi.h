@@ -16,6 +16,10 @@ public:
 	void updateLocomote(Ogre::Real deltaTime);
 	void setMovement(char dir, bool on); //set the movemnt
 	void rotationCode(OIS::MouseEvent arg);  //Rotate the hero when we move the mouse
+	void buttonAnimation(char pressed);		//tell me what animation to do
+	bool getAnimation();					//are you currently executing an animation?
+
+	bool doingStuff;		//if Yoshimi is currently doing a non-looping animation
 
 private:
 	bool fForward; //how am I moving? Each flag indicates a direction
@@ -53,6 +57,8 @@ private:
 	void fadeAnimations(Ogre::Real deltaTime);				// blend from one animation to another
 	void updateAnimations(Ogre::Real deltaTime);			// update the animation frame
 	void setAnimation(AnimID id, bool reset = false);
+
+	
 
 };
 

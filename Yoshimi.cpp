@@ -13,7 +13,10 @@ Yoshimi::Yoshimi(Ogre::SceneManager* SceneManager, std::string name, std::string
 	cam->setPosition(temp1);
 	mBodyNode->attachObject(app->getCamera());	// main character has camera attached ! ?
 	fForward = fBackward = fRight = fLeft = false;  //starts by not moving
+
+	doingStuff = false;  //starts not doing anything
 	
+	mBodyNode->showBoundingBox(true);  //for testing purposes
 	//Get them animations brah
 	/*Ogre::AnimationStateSet* aSet = mBodyEntity->getAllAnimationStates();
 	Ogre::AnimationStateIterator iter = mBodyEntity->getAllAnimationStates()->getAnimationStateIterator();
@@ -34,7 +37,7 @@ void Yoshimi::update(Ogre::Real deltaTime){
 
 void Yoshimi::updateLocomote(Ogre::Real deltaTime){
 	Ogre::Quaternion q;
-	double speed = 0.5;  //how fast is Yoshimi?
+	double speed = 0.2;  //how fast is Yoshimi?
 	Ogre::Vector3 translator = Ogre::Vector3::ZERO;
 
 	//use direction for forward and backward
@@ -50,11 +53,13 @@ void Yoshimi::updateLocomote(Ogre::Real deltaTime){
 	if (fRight) translator += (side * speed);
 	if (fBackward) translator += (mDirection * speed);
 
-	//Set Yoshimi Animation based on movement
-	if (!fForward && !fLeft && !fRight && !fBackward){
-		if (yoshAnim != IDLE_THREE) setAnimation(IDLE_THREE);
-	}else{
-		if (yoshAnim != STEALTH) setAnimation(STEALTH);
+	//Set Yoshimi Animation based on movement (if not already doing stuff)
+	if (!doingStuff){
+		if (!fForward && !fLeft && !fRight && !fBackward){
+			if (yoshAnim != IDLE_THREE) setAnimation(IDLE_THREE);
+		}else{
+			if (yoshAnim != STEALTH) setAnimation(STEALTH);
+		}
 	}
 	mBodyNode->translate(translator);
 }
@@ -78,8 +83,8 @@ void Yoshimi::updateAnimations(Ogre::Real deltaTime){
 
 	//If Yoshimi has an active animation, call the update method
 	if (yoshAnim != ANIM_NONE){
-		mAnims[yoshAnim]->addTime(deltaTime * .5);
-		
+		mAnims[yoshAnim]->addTime(deltaTime * 2);
+		if (mAnims[yoshAnim]->hasEnded()) doingStuff = false;   //no longer doing stuff
 	}
 	//transitions
 	fadeAnimations(deltaTime);
@@ -130,7 +135,11 @@ void Yoshimi::setupAnimations(){
 	for (int i = 0; i < 20; i++)
 	{
 		mAnims[i] = mBodyEntity->getAnimationState(animNames[i]);
-		mAnims[i]->setLoop(true);
+		
+		//Some animations are not looping
+		if (animNames[i] == "Idle3" || animNames[i] == "Stealth") mAnims[i]->setLoop(true);
+		else mAnims[i]->setLoop(false);
+
 		mFadingIn[i] = false;
 		mFadingOut[i] = false;
 	}
@@ -159,4 +168,13 @@ void Yoshimi::setAnimation(AnimID id, bool reset){
 		mFadingIn[id] = true;
 		if (reset) mAnims[id]->setTimePosition(0);
 	}
+}
+
+void Yoshimi::buttonAnimation(char key){
+	if (key == 'j'){
+		setAnimation(JUMP, true);
+	}
+	else if (key == 't') setAnimation(ATTACK_ONE, true);  //throw fishbomb
+	else if (key == 's') setAnimation(ATTACK_THREE, true);//use sword
+	else if (key == 'k') setAnimation(KICK, true);		  //judo-kick
 }
