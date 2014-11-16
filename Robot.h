@@ -18,7 +18,6 @@ public:
 	void update(Ogre::Real deltaTime);		// update hero!
 	void updateLocomote(Ogre::Real deltaTime);
 	void setMovement(char dir, bool on); //set the movemnt
-	void rotationCode(OIS::MouseEvent arg);  //Rotate the hero when we move the mouse
 
 private:
 	enum AnimID
@@ -31,11 +30,26 @@ private:
 		ANIM_NONE
 	};
 
+	enum State{
+		NORMAL,
+		HURT,
+		ANGRY,
+		BOSS,
+		FOLLOWER
+	};
+
+	State state;
 	AnimID robAnim;
+	Ogre::Vector3 mDirection;
 	void setupAnimations();									// load this character's animations
 	void fadeAnimations(Ogre::Real deltaTime);				// blend from one animation to another
 	void updateAnimations(Ogre::Real deltaTime);			// update the animation frame
 	void setAnimation(AnimID id, bool reset = false);
+
+	Ogre::Vector3 flockingNormal();
+	Ogre::Vector3 flockingFlee();
+	Ogre::Vector3 flockingSeek();
+	Ogre::Vector3 flockingLeader();
 
 };
 

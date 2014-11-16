@@ -12,55 +12,48 @@ Robot::Robot(Ogre::SceneManager* SceneManager, std::string name, std::string fil
 	{
 		Ogre::AnimationState *a = iter.getNext();
 	}
+
+	Ogre::AxisAlignedBox uhh = mBodyEntity->getBoundingBox();
+	mSceneMgr->showBoundingBoxes(true);
+	mBodyNode->showBoundingBox(false);
 	counter = 0;
 	testing = 0;
+	mDirection = Ogre::Vector3::ZERO;
 	setupAnimations();
 }
 
 void Robot::update(Ogre::Real deltaTime){
 	this->updateAnimations(deltaTime);	// Update animation playback
 	this->updateLocomote(deltaTime);	// Update Locomotion
-	/*counter++;
-	if (counter > 100){
-		counter = counter % 100;
-		testing++;
-		if (testing > 5){
-			testing = 0;
-		}
-		if(testing == 0){
-			setAnimation(DIE);
-		}
-		if(testing == 1){
-			setAnimation(IDLE);
-		}
-		if(testing == 2){
-			setAnimation(SHOOT);
-		}
-		if(testing == 3){
-			setAnimation(SLUMP);
-		}
-		if(testing == 4){
-			setAnimation(WALK);
-		}
-		if(testing == 5){
-			setAnimation(ANIM_NONE);
-		}
-	}*/
+
 }
 
 void Robot::updateLocomote(Ogre::Real deltaTime){
-	Ogre::Quaternion q;
-	double speed = 0.5;  //how fast is Robot?
-	Ogre::Vector3 translator = Ogre::Vector3::ZERO;
-
-	//use direction for forward and backward
-	mDirection = mBodyNode->getOrientation() * Ogre::Vector3::UNIT_Z;
-
-	//90 degrees from mDirection for right and left
-	q.FromAngleAxis(Ogre::Radian(M_PI) / 2, Ogre::Vector3(0,1,0));
-	Ogre::Vector3 side = q*mDirection;
-
-	mBodyNode->translate(translator);
+	mDirection = flockingNormal();//get the flocking velocity
+	if (mDirection != Ogre::Vector3::ZERO){//if the velocity isnt zero set up animations
+		if (robAnim != WALK){
+			setAnimation(WALK);
+		}
+		mTimer = 0;
+		//always rotating
+		Ogre::Vector3 src = mBodyNode->getOrientation() * Ogre::Vector3::UNIT_Z;//rotate for first location
+		if ((1.0f + src.dotProduct(mDirection)) < 0.0001f) 
+		{
+			mBodyNode->yaw(Ogre::Degree(180));
+		}
+		else
+		{
+			Ogre::Quaternion quat = src.getRotationTo(mDirection.normalisedCopy());
+			mBodyNode->rotate(quat);
+		}
+		mBodyNode->translate(mDirection);
+	}
+	else{//when velocity is zero set idle animations
+		if(robAnim != IDLE ){
+			setAnimation(IDLE);
+		}
+		mTimer = 0;
+	}
 }
 
 //Set movement flags based on a char to represent direction and boolean on or not
@@ -68,9 +61,6 @@ void Robot::setMovement(char dir, bool on){
 	
 }
 
-void Robot::rotationCode(OIS::MouseEvent arg){
-	mBodyNode->yaw(Ogre::Degree(arg.state.X.rel * -0.1f));
-}
 
 void Robot::updateAnimations(Ogre::Real deltaTime){
 	mTimer += deltaTime; // how much time has passed since the last update
@@ -153,4 +143,18 @@ void Robot::setAnimation(AnimID id, bool reset){
 		// if we have a new animation, enable it and fade it in
 		mAnims[id]->setEnabled(true);
 	}
+}
+
+Ogre::Vector3 Robot::flockingNormal(){				//need to add stuff to gameapplication
+	return Ogre::Vector3::ZERO;
+}
+
+Ogre::Vector3 Robot::flockingFlee(){
+	return Ogre::Vector3::ZERO;
+}
+Ogre::Vector3 Robot::flockingSeek(){
+	return Ogre::Vector3::ZERO;
+}
+Ogre::Vector3 Robot::flockingLeader(){
+	return Ogre::Vector3::ZERO;
 }
