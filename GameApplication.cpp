@@ -352,6 +352,7 @@ GameApplication::keyPressed( const OIS::KeyEvent &arg ) // Moved from BaseApplic
     }
 	else if (arg.key == OIS::KC_SPACE)
 	{
+		yoshPointer->changeSpeed(.6);  //jump should be slower
 		yoshPointer->buttonAnimation('j');
 		yoshPointer->doingStuff = true;
 	}
@@ -409,6 +410,7 @@ bool GameApplication::mousePressed( const OIS::MouseEvent &arg, OIS::MouseButton
 	// attack using left and right mouse buttons
 	if(id == OIS::MB_Left)
 	{
+		yoshPointer->changeSpeed(1);
 		yoshPointer->buttonAnimation('s');
 		yoshPointer->doingStuff = true;
 	}
@@ -425,22 +427,6 @@ bool GameApplication::mousePressed( const OIS::MouseEvent &arg, OIS::MouseButton
 
 bool GameApplication::mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id )
 {
-	// Lecture 12
-	if(id  == OIS::MB_Left)
-	{
-		bLMouseDown = false;
-	}
-	if(id  == OIS::MB_Right)
-	{
-		bRMouseDown = false;
-	}
-	else
-		mCameraMan->injectMouseUp(arg, id);
-
-	//////////////////////////////////////////////////////////////////////////////
-   
-    if (mTrayMgr->injectMouseUp(arg, id)) return true;
-    mCameraMan->injectMouseUp(arg, id);
     return true;
 }
 
