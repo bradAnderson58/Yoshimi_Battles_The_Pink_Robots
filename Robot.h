@@ -9,6 +9,9 @@ class Robot : public Agent{
 
 public:
 
+	int counter;
+	int testing;
+
 	Robot(Ogre::SceneManager* SceneManager, std::string name, std::string filename, float height, float scale, GameApplication* a);
 	~Robot();
 
