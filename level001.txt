@@ -5,9 +5,8 @@ Objects
 b Barrel.mesh 3.5 0.0 1
 
 Characters
-m fish.mesh 3.0 2.0
-n ninja.mesh 3.0 0.2
-r robot.mesh 3.0 0.4
+n ninja.mesh 3.0 0.04
+r robot.mesh 3.0 0.08
 
 World
 oooooooooooooooooooo

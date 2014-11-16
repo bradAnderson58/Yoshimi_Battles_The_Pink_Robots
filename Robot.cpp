@@ -11,8 +11,6 @@ Robot::Robot(Ogre::SceneManager* SceneManager, std::string name, std::string fil
 	while (iter.hasMoreElements())
 	{
 		Ogre::AnimationState *a = iter.getNext();
-		std::string s = a->getAnimationName();
-		std::cout << s << std::endl;
 	}
 	
 	setupAnimations();
@@ -48,12 +46,10 @@ void Robot::rotationCode(OIS::MouseEvent arg){
 }
 
 void Robot::updateAnimations(Ogre::Real deltaTime){
-	std::cout << robAnim << std::endl;
 	mTimer += deltaTime; // how much time has passed since the last update
 
 	if (robAnim != ANIM_NONE){
 		mAnims[robAnim]->addTime(deltaTime * 1);
-		std::cout << "Here?" << std::endl;
 	}
 	//transitions
 	//fadeAnimations(deltaTime);
