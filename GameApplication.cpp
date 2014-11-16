@@ -184,6 +184,7 @@ GameApplication::loadEnv()
 				else if (c == 'i') // create a invisible wall
 				{
 					Entity* ent = mSceneMgr->createEntity(getNewName(), Ogre::SceneManager::PT_CUBE);
+					ent->setMaterialName("Examples/RustySteel");
 					Ogre::SceneNode* mNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
 					mNode->attachObject(ent);
 					mNode->scale(0.1f,0.2f,0.1f); // cube is 100 x 100
