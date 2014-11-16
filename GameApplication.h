@@ -14,34 +14,10 @@ private:
 	std::list<Agent*> agentList; // Lecture 5: now a list of agents
 
 	Yoshimi* yoshPointer;	//This is our heroic savior, Yoshimi!
-	
-	//these values will be passed to the fire method to fire our fish
-	int trajVal;
-	int velVal;
-
-	OgreBites::Slider *mSlider; // I want to mess with this in other places as well
-	bool pos;  //slider moves back and forth
-	int slowMe;  //move slider bar
-	int lightMe; //change lighting
 
 	Ogre::AxisAlignedBox boundBox;  //bounding box of the barrel
 
-public:
-	enum stateState				//we gonna press the space bar for everything so this will be that
-	{
-		TRAJECTORY,
-		VELOCITY,
-		FIRE,
-		ANIMATE
-	};
-	enum colorVal			//Change lighting to indicate hits and misses
-	{
-		RED,
-		GREEN,
-		WHITE
-	};
-
-	void changeLighting(colorVal change);	
+public:	
 
     GameApplication(void);
     virtual ~GameApplication(void);
@@ -72,12 +48,6 @@ public:
 
 	/////////////////////////////////////////////////////////////////////////////////
 
-	void setState(stateState st) { state = st; };	//set the state from outside class
-
-	void slideCaption(std::string labl) { mSlider->setCaption(labl); }  //set the slider label from outside class
-
-	void setSuccess(int num);	//set update the number of success
-
 	Ogre::AxisAlignedBox getBox() { return boundBox; }  //return the bounding box of barrel
 
 	Ogre::Camera* getCamera() { return mCamera; }  //why u no like?
@@ -88,10 +58,6 @@ protected:
 	virtual void createGUI(void);  //for gui's
 	OgreBites::ParamsPanel* mParamsPanel;
 
-private:
-	stateState state;		//lol
-	colorVal lightColor;	//keep track of what color the lighting is
-	Ogre::Light *mLight;	//keep this light around too
 };
 
 #endif // #ifndef __TutorialApplication_h_

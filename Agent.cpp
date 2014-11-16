@@ -28,13 +28,6 @@ Agent::Agent(Ogre::SceneManager* SceneManager, std::string name, std::string fil
 	mBodyNode->scale(scale,scale,scale); // Scale the figure
 	mBodyNode->yaw(Ogre::Degree(-90)); //fish goes this way
 
-	//AnimationStateSet* aSet = mBodyEntity->getAllAnimationStates();
-	//AnimationStateIterator iter = mBodyEntity->getAllAnimationStates()->getAnimationStateIterator();
-	//while (iter.hasMoreElements())
-	//{
-	//	AnimationState *a = iter.getNext();
-	//	std::string s = a->getAnimationName();
-	//}
 
 	//setupAnimations();  // load the animation for this character
 
@@ -68,10 +61,7 @@ Agent::setPosition(float x, float y, float z)
 void
 Agent::update(Ogre::Real deltaTime) 
 {
-	if (projectile) // Lecture 12
-		shoot(deltaTime);
-	else
-		this->updateLocomote(deltaTime);	// Update Locomotion
+	this->updateLocomote(deltaTime);	// Update Locomotion
 	
 	this->updateAnimations(deltaTime);	// Update animation playback
 }
@@ -117,80 +107,4 @@ Agent::updateLocomote(Ogre::Real deltaTime)
 {
 }
 
-void
-Agent::fire(int trajectory, int velocity) // lecture 12
-{
-
-	//At the end of the sequence, the fish will return to the starting position / orientation
-	defaultPos = this->mBodyNode->getPosition();
-	defaultOrient = this->mBodyNode->getOrientation();
-
-	projectile = true; // turns on the movement
-	this->setBaseAnimation(ANIM_NONE);  //Swimming?
-
-	// set up the initial state
-	initPos = this->mBodyNode->getPosition();
-	vel.x = 0;											 //x value not changed (possibly add later)
-	vel.y = sin((M_PI * trajectory) / 180) * velocity;   //y and z values are determined by the angle of trajectory multiplied by velocity
-	vel.z = -cos((M_PI * trajectory) / 180) * velocity;
-
-	//gravity
-	gravity.x = 0;
-	gravity.y = -9.81;
-	gravity.z = 0;
-	//ps->setVisible(true);
-
-	//view the fish bounding box by uncommenting this:
-	//this->mBodyNode->showBoundingBox(true); 
-	this->mBodyNode->roll(Ogre::Degree(-vel.y));  //point nose towards vector of movement
-}
-
-void
-Agent::shoot(Ogre::Real deltaTime) // lecture 12 call for every frame of the animation
-{
-	using namespace Ogre;
-
-	Vector3 pos = this->mBodyNode->getPosition();
-	vel = vel + (gravity * deltaTime);
-	pos = pos + (vel * deltaTime); // velocity
-	pos = pos + 0.5 * gravity * deltaTime * deltaTime; // acceleration
-
-	this->mBodyNode->setPosition(pos);
-
-	//update the orientation to 'follow' the arc
-	this->mBodyNode->setOrientation(defaultOrient);
-	this->mBodyNode->roll(Ogre::Degree(-vel.y));
-
-	//Collision code
-	Ogre::AxisAlignedBox objBox = this->mBodyEntity->getWorldBoundingBox();
-	bool hit = objBox.intersects(app->getBox());
-
-	if (this->mBodyNode->getPosition().y <= 0 || hit) // if it get close to the ground, OR hits barrel stop
-	{
-		//if the barrel was hit, update the success gui
-		if (hit) {
-			successes++;
-			app->setSuccess(successes);
-			app->changeLighting(GameApplication::GREEN);
-		}
-		else app->changeLighting(GameApplication::RED);  //this is for a miss
-
-		// when finished reset
-		projectile = false;
-		setBaseAnimation(ANIM_NONE);  //stop swimming
-		//ps->setVisible(false);
-
-		this->mBodyNode->setPosition(initPos); //Go back to try again! 
-
-		//Go back to trajectory setting in slider
-		app->setState(GameApplication::TRAJECTORY);
-		app->slideCaption("Trajectory");
-
-		//reset fish to original positioning
-		this->mBodyNode->setPosition(defaultPos);
-		this->mBodyNode->setOrientation(defaultOrient);
-		
-
-	}
-}
 

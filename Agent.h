@@ -23,7 +23,7 @@ protected:
 	Ogre::Vector3 initPos; // initial position
 	Ogre::Vector3 vel; // velocity of agent
 	Ogre::Vector3 gravity; 
-	void shoot(Ogre::Real deltaTime); // shoots the agent through the air
+	
 	//Ogre::ParticleSystem* ps;  //I like the particles, I will keep them
 
 	GameApplication *app;
@@ -83,8 +83,6 @@ public:
 	
 	void setBaseAnimation(AnimID id, bool reset = false);	// choose animation to display
 	void setTopAnimation(AnimID id, bool reset = false);
-
-	void fire(int trajectory, int velocity);		// gameApp passes the trajectory and velocity from slider gui
 
 	void setApp(GameApplication *a) { app = a; }  //I need to access some stuff in the gameApplication from the agent
 };

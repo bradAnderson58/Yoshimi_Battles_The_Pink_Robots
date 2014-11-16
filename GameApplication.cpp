@@ -11,11 +11,7 @@ GameApplication::GameApplication(void):
 	bRMouseDown(false)
 {
 	agent = NULL; // Init member data
-	state = TRAJECTORY;		//first state should be trajectory
-	lightColor = WHITE;		//default lighting is white
-	pos = true;
-	slowMe = 0;			//adjust speed of slider
-	lightMe = 0;		//for changing lighting
+	
 }
 //-------------------------------------------------------------------------------------
 GameApplication::~GameApplication(void)
@@ -29,8 +25,8 @@ void GameApplication::createScene(void)
 {
     loadEnv();
 	setupEnv();
-	loadObjects();
-	loadCharacters();
+	//loadObjects();
+	//loadCharacters();
 	//////////////////////////////////////////////////////////////////////////////////
 	// Lecture 12
 	//but we also want to set up our raySceneQuery after everything has been initialized
@@ -231,26 +227,13 @@ GameApplication::setupEnv()
 	mSceneMgr->setAmbientLight(ColourValue(0.5f, 0.5f, 0.5f));
 
 	// add a bright light above the scene
-	mLight = mSceneMgr->createLight();
+	Ogre::Light* mLight = mSceneMgr->createLight();
 	mLight->setType(Light::LT_POINT);
 	mLight->setPosition(-10, 40, 20);
 	mLight->setSpecularColour(ColourValue::White);
 	mLight->setDiffuseColour(ColourValue::White);
 
 	mSceneMgr->setSkyDome(true, "Examples/CloudySky", 5, 8); // pretty sky
-}
-
-void // Load other props or objects
-GameApplication::loadObjects()
-{
-
-}
-
-void // Load actors, agents, characters
-GameApplication::loadCharacters()
-{
-	// Lecture 5: now loading from file
-	// agent = new Agent(this->mSceneMgr, "Sinbad", "Sinbad.mesh");
 }
 
 void
@@ -264,29 +247,6 @@ GameApplication::addTime(Ogre::Real deltaTime)
 
 	yoshPointer->update(deltaTime); //Yoshimi has a different update function
 	
-
-	if (state != FIRE && state != ANIMATE && slowMe >= 3){
-
-		//If the slider is at the top or bottom, reverse it.
-		Ogre::Real val = mSlider->getValue();
-		if (val >= 100) pos = false;
-		else if (val <= 0) pos = true;
-
-		//move the slider
-		if (pos) mSlider->setValue(val + 1);
-		else mSlider->setValue(val - 1);
-		slowMe = 0;
-		
-		//reset color value
-		if (lightColor != WHITE){
-			lightMe++;						//leave different color up for a few frames
-			if (lightMe > 5){
-				changeLighting(WHITE);
-				lightMe = 0;
-			}
-		}
-	}
-	slowMe++;
 }
 
 bool 
@@ -381,37 +341,7 @@ GameApplication::keyPressed( const OIS::KeyEvent &arg ) // Moved from BaseApplic
     }
 	else if (arg.key == OIS::KC_SPACE)
 	{
-		//States!  This is the case where the player must choose a trajectory
-		if (state == TRAJECTORY) {
-			//updte trajectory
-			trajVal = (mSlider->getValue());
-
-			//uncomment this to test success condition with hardcoded value:
-			//trajVal = 35;
-
-			mSlider->setCaption("Velocity");
-			mSlider->setValue(0);
-			state = VELOCITY;
-
-		//This is the case where the player must choose a velocity
-		}else if (state == VELOCITY){
-			//update velocity val
-			velVal = (mSlider->getValue());
-
-			//uncomment this to test success condition with hardcoded value:
-			//velVal = 40;
-
-			mSlider->setCaption("FIRE FISH!");
-			mSlider->setValue(0);
-			state = FIRE;
-
-		//This is the state where the fish fires (The fish will reset to trajectory state thru a pointer after animation completes)
-		}else if (state == FIRE){
-			this->agent->fire(trajVal, velVal); // rocket propelled fish!
-			state = ANIMATE;
-			
-			//mSlider->setCaption("Trajectory");
-		}else{ std::cout << "Yo you gotta wait!" << std::endl; }
+		//Jump
 	}
 	else if (arg.key == OIS::KC_W) {
 		
@@ -542,48 +472,18 @@ void GameApplication::createGUI(void)
 	std::string label = "Trajectory"; 
 	
 	//The slider will be used to get the value of the trajectory and the velocity
-	mSlider = mTrayMgr->createThickSlider(TL_TOP, "SampleSlider", label, 250, 80, 0, 0, 0);
+	/*mSlider = mTrayMgr->createThickSlider(TL_TOP, "SampleSlider", label, 250, 80, 0, 0, 0);
 	mSlider->setRange(0, 100, 101); //so the third parmeter for this method was not what i was expecting: much confuse
 	mSlider->setValue(50);
-	mTrayMgr->sliderMoved(mSlider);
+	mTrayMgr->sliderMoved(mSlider);*/
 	
 	//use the paramsPanel to display number of successful shots
 	Ogre::StringVector items;
-	items.push_back("Successes");
+	items.push_back("Yoshimi");
 	mParamsPanel = mTrayMgr->createParamsPanel(OgreBites::TL_TOPRIGHT,"Testing",250,items);
 	mParamsPanel->setParamValue(0, Ogre::StringConverter::toString(0));
 
 	mTrayMgr->showAll();
 
 	//////////////////////////////////////////////////////////////////////////////////
-}
-
-void GameApplication::setSuccess(int num){
-	mParamsPanel->setParamValue(0, Ogre::StringConverter::toString(num));
-}
-
-void GameApplication::changeLighting(colorVal change){
-	lightColor = change;
-	if (lightColor == WHITE){
-		// change ambient and specular to white
-		mSceneMgr->setAmbientLight(Ogre::ColourValue(0.5f, 0.5f, 0.5f));
-		mLight->setSpecularColour(Ogre::ColourValue::White);
-		mLight->setDiffuseColour(Ogre::ColourValue::White);
-	
-	//change the scene red
-	}else if (lightColor == RED){
-		mSceneMgr->setAmbientLight(Ogre::ColourValue(1.0f, 0.1f, 0.1f));
-		mLight->setSpecularColour(Ogre::ColourValue::Red);
-		mLight->setDiffuseColour(Ogre::ColourValue::Red);
-	
-	//change the scene green
-	}else if (lightColor == GREEN){
-		mSceneMgr->setAmbientLight(Ogre::ColourValue(0.1f, 1.0f, 0.1f));
-		mLight->setSpecularColour(Ogre::ColourValue::Green);
-		mLight->setDiffuseColour(Ogre::ColourValue::Green);
-		
-	//error checking
-	}else{
-		std::cout << "No valid color" << std::endl;
-	}
 }
