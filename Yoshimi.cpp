@@ -6,6 +6,11 @@
 Yoshimi::Yoshimi(Ogre::SceneManager* SceneManager, std::string name, std::string filename, float height, float scale, GameApplication* a):
 	Agent(SceneManager, name, filename, height, scale, a)
 {
+	Ogre::Vector3 temp(mBodyNode->getPosition());
+	Ogre::Vector3 temp1(temp[0], temp[1]+5, temp[2]+10);//move camera to location. temp[1] is height relative to yoshimi temp[2] is z distance
+	Ogre::Camera* cam = app->getCamera();
+	cam->pitch(Ogre::Radian(10 * M_PI /180));
+	cam->setPosition(temp1);
 	mBodyNode->attachObject(app->getCamera());	// main character has camera attached ! ?
 	fForward = fBackward = fRight = fLeft = false;  //starts by not moving
 	
