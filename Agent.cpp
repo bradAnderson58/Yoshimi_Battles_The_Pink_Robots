@@ -26,7 +26,7 @@ Agent::Agent(Ogre::SceneManager* SceneManager, std::string name, std::string fil
 
 	mBodyNode->translate(0,height,0); // make the Ogre stand on the plane (almost)
 	mBodyNode->scale(scale,scale,scale); // Scale the figure
-	mBodyNode->yaw(Ogre::Degree(-90)); //fish goes this way
+	//mBodyNode->yaw(Ogre::Degree(-90)); //fish goes this way
 
 
 	//setupAnimations();  // load the animation for this character

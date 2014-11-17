@@ -13,7 +13,7 @@ Robot::Robot(Ogre::SceneManager* SceneManager, std::string name, std::string fil
 		Ogre::AnimationState *a = iter.getNext();
 	}
 
-	//mBodyNode->yaw(Ogre::Degree(90)); //fish goes this way
+	//mBodyNode->yaw(Ogre::Degree(180)); //fish goes this way
 	//mBodyNode->pitch(Ogre::Degree(180));
 	Ogre::AxisAlignedBox uhh = mBodyEntity->getBoundingBox();
 	mSceneMgr->showBoundingBoxes(true);
@@ -38,7 +38,7 @@ void Robot::updateLocomote(Ogre::Real deltaTime){
 		}
 		mTimer = 0;
 		//always rotating
-		Ogre::Vector3 src = mBodyNode->getOrientation() * Ogre::Vector3::UNIT_Z;//rotate for first location
+		Ogre::Vector3 src = mBodyNode->getOrientation() * Ogre::Vector3::UNIT_X;//rotate for first location
 		if ((1.0f + src.dotProduct(mDirection)) < 0.0001f) 
 		{
 			mBodyNode->yaw(Ogre::Degree(180));
@@ -206,7 +206,7 @@ Ogre::Vector3 Robot::flockingNormal(){				//need to add stuff to gameapplication
 	//adding a force for moving towards a goal
 	omgwork = omgwork - mBodyNode->getPosition();
 	//if an agent is close enough to the goal pop it off the queue
-	if(sqrt(pow(omgwork[0], 2) + pow(omgwork[1], 2) + pow(omgwork[2], 2)) < 15){
+	if(sqrt(pow(omgwork[0], 2) + pow(omgwork[1], 2) + pow(omgwork[2], 2)) < 40){
 		return Ogre::Vector3::ZERO;
 	}
 	//normalise the difference vector so you can limit the speed better
@@ -214,7 +214,7 @@ Ogre::Vector3 Robot::flockingNormal(){				//need to add stuff to gameapplication
 	omgwork[1] = 0;
 
 	//the constants and parts of the velocity put together.
-	vel = .01 * alignment + 2.5 * seperation + .1 * cohesion +  0.0002 * omgwork;
+	vel = .01 * alignment + 2.5 * seperation + .1 * cohesion +  .05 * omgwork;
 
 	return vel;
 }
