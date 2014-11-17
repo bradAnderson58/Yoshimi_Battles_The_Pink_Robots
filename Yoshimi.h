@@ -17,7 +17,7 @@ public:
 	void setMovement(char dir, bool on); //set the movemnt
 	void rotationCode(OIS::MouseEvent arg);  //Rotate the hero when we move the mouse
 	void buttonAnimation(char pressed);		//tell me what animation to do
-											//are you currently executing an animation?
+	
 
 	bool doingStuff;		//if Yoshimi is currently doing a non-looping animation
 	void changeSpeed(double s) { speed = s; }	//change the speed for different animations
@@ -27,6 +27,8 @@ private:
 	bool fRight;
 	bool fLeft;
 	double speed;	//how fast to move
+
+	Ogre::SceneNode* mAttackNode;	//use this for bounding area for Yoshimi attacks
 
 	enum AnimID
 	{

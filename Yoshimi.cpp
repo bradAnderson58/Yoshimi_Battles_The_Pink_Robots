@@ -6,19 +6,41 @@
 Yoshimi::Yoshimi(Ogre::SceneManager* SceneManager, std::string name, std::string filename, float height, float scale, GameApplication* a):
 	Agent(SceneManager, name, filename, height, scale, a)
 {
+	//origin
+	mBodyNode->setPosition(0.0,0.0,0.0);
+
+	//Camera set up here
 	Ogre::Vector3 temp(mBodyNode->getPosition());
 	Ogre::Vector3 temp1(temp[0], temp[1]+10, temp[2]+10);//move camera to location. temp[1] is height relative to yoshimi temp[2] is z distance
 	Ogre::Camera* cam = app->getCamera();
 	cam->pitch(Ogre::Radian(10 * M_PI /180));
 	cam->setPosition(temp1);
-	mBodyNode->attachObject(app->getCamera());	// main character has camera attached ! ?
-	fForward = fBackward = fRight = fLeft = false;  //starts by not moving
 
+	//attaching camera code here
+	Ogre::SceneNode* camNode = mBodyNode->createChildSceneNode();
+	camNode->attachObject(cam);
+
+	fForward = fBackward = fRight = fLeft = false;  //starts by not moving
 	doingStuff = false;  //starts not doing anything
 	speed = 2;	//Yoshimi a quick one 
 
-	mBodyNode->showBoundingBox(true);  //for testing purposes
-	//Get them animations brah
+	mBodyNode->showBoundingBox(true); //for testing purposes
+
+	//attack space
+	mAttackNode = mBodyNode->createChildSceneNode();
+	Ogre::Entity* cube = mSceneMgr->createEntity("attackCube", Ogre::SceneManager::PT_CUBE);
+	cube->setMaterialName("Examples/RustySteel");
+	mAttackNode->attachObject(cube);
+	
+	//mAttackNode->scale(0.2f,0.2f,0.2f); // cube is 100 x 100
+	//grid.getNode(i,j)->setOccupied();  // indicate that agents can't pass through
+	mAttackNode->setPosition(0.0f ,100.0f, -100.0f);
+	mAttackNode->setVisible(true);
+	mAttackNode->showBoundingBox(true);
+	
+	//mAttackNode->attachObject(cube);
+
+	//use this to check animations if needed
 	/*Ogre::AnimationStateSet* aSet = mBodyEntity->getAllAnimationStates();
 	Ogre::AnimationStateIterator iter = mBodyEntity->getAllAnimationStates()->getAnimationStateIterator();
 	while (iter.hasMoreElements())
