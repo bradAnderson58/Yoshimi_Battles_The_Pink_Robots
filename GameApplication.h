@@ -5,16 +5,17 @@
 #include "Agent.h"
 #include "Yoshimi.h"
 #include "Robot.h"
-
+#include "Grid.h"
 
 class GameApplication : public BaseApplication
 {
 private:
 	Agent* agent; // store a pointer to the character
-	std::list<Agent*> agentList; // Lecture 5: now a list of agents
+	std::list<Robot*> RobotList; // Lecture 5: now a list of agents
 
 	Yoshimi* yoshPointer;	//This is our heroic savior, Yoshimi!
-
+	Ogre::SceneNode* housePointer;
+	std::list<Ogre::SceneNode*> wallList;
 	Ogre::AxisAlignedBox boundBox;  //bounding box of the barrel
 
 public:	
@@ -51,6 +52,11 @@ public:
 	Ogre::AxisAlignedBox getBox() { return boundBox; }  //return the bounding box of barrel
 
 	Ogre::Camera* getCamera() { return mCamera; }  //why u no like?
+	Yoshimi* getYoshimiPointer(){return yoshPointer;}
+	std::list<Ogre::SceneNode*> getWallList(){return wallList;}
+	std::list<Robot*> getRobotList(){return RobotList;}
+	Ogre::SceneNode* getHousePointer(){return housePointer;}
+
 
 protected:
     virtual void createScene(void);

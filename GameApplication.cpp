@@ -1,5 +1,4 @@
 #include "GameApplication.h"
-#include "Grid.h" // Lecture 5
 #include <fstream>
 #include <sstream>
 #include <map> 
@@ -11,6 +10,7 @@ GameApplication::GameApplication(void):
 	bRMouseDown(false)
 {
 	agent = NULL; // Init member data
+	housePointer = NULL;
 	
 }
 //-------------------------------------------------------------------------------------
@@ -154,17 +154,21 @@ GameApplication::loadEnv()
 					if (c == 'n') {
 						agent = new Yoshimi(this->mSceneMgr, getNewName(), rent->filename, rent->y, rent->scale, this);
 						yoshPointer = (Yoshimi*) agent;  //you are a yoshimi
+						agent->setPosition(grid.getPosition(i,j).x, 0, grid.getPosition(i,j).z);
 					}else {
-						agent = new Robot(this->mSceneMgr, getNewName(), rent->filename, rent->y, rent->scale, this);
-						agentList.push_back(agent);
+						Robot* robot = new Robot(this->mSceneMgr, getNewName(), rent->filename, rent->y, rent->scale, this);
+						RobotList.push_back(robot);
 					}
 					//agent->setApp(this);  //in constructor
-					
-					agent->setPosition(grid.getPosition(i,j).x, 0, grid.getPosition(i,j).z);
 					
 				}
 				else	// Load objects
 				{
+					if (rent->filename == "tudorhouse.mesh"){
+						String work = getNewName();
+						temp = grid.loadObject(work, rent->filename, i, rent->y, j, rent->scale);
+						housePointer = mSceneMgr->getSceneNode(work);
+					}
 					//The temp object holds a pointer to the barrel node, which we need for bounding box access
 					temp = grid.loadObject(getNewName(), rent->filename, i, rent->y, j, rent->scale);
 					
@@ -180,6 +184,7 @@ GameApplication::loadEnv()
 					mNode->scale(0.1f,0.2f,0.1f); // cube is 100 x 100
 					grid.getNode(i,j)->setOccupied();  // indicate that agents can't pass through
 					mNode->setPosition(grid.getPosition(i,j).x, 10.0f, grid.getPosition(i,j).z);
+					wallList.push_back(mNode);
 				}
 				else if (c == 'i') // create a invisible wall
 				{
@@ -191,6 +196,7 @@ GameApplication::loadEnv()
 					grid.getNode(i,j)->setOccupied();  // indicate that agents can't pass through
 					mNode->setPosition(grid.getPosition(i,j).x, 10.0f, grid.getPosition(i,j).z);
 					mNode->setVisible(false);
+					wallList.push_back(mNode);
 				}
 				else if (c == 'e')
 				{
@@ -251,8 +257,8 @@ void
 GameApplication::addTime(Ogre::Real deltaTime)
 {
 	// Iterate over the list of agents (robots)
-	std::list<Agent*>::iterator iter;
-	for (iter = agentList.begin(); iter != agentList.end(); iter++)
+	std::list<Robot*>::iterator iter;
+	for (iter = RobotList.begin(); iter != RobotList.end(); iter++)
 		if (*iter != NULL)
 			(*iter)->update(deltaTime);
 
