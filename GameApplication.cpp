@@ -381,8 +381,10 @@ GameApplication::keyPressed( const OIS::KeyEvent &arg ) // Moved from BaseApplic
 	}
 	//Some wicked attacks
 	else if (arg.key == OIS::KC_Q){
-		yoshPointer->buttonAnimation('t');
-		yoshPointer->doingStuff = true;
+		if(!yoshPointer->doingStuff){
+			yoshPointer->buttonAnimation('t');
+			yoshPointer->doingStuff = true;
+		}
 	}
    
     //mCameraMan->injectKeyDown(arg);
@@ -417,13 +419,13 @@ bool GameApplication::mousePressed( const OIS::MouseEvent &arg, OIS::MouseButton
 {
 	//////////////////////////////////////////////////////////////////////////////////////
 	// attack using left and right mouse buttons
-	if(id == OIS::MB_Left)
+	if(id == OIS::MB_Left && !yoshPointer->doingStuff)
 	{
 		yoshPointer->changeSpeed(1);
 		yoshPointer->buttonAnimation('s');
 		yoshPointer->doingStuff = true;
 	}
-	else if (id == OIS::MB_Right){
+	else if (id == OIS::MB_Right && !yoshPointer->doingStuff){
 		yoshPointer->buttonAnimation('k');
 		yoshPointer->doingStuff = true;
 	}
