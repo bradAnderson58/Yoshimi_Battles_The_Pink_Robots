@@ -22,6 +22,12 @@ Robot::Robot(Ogre::SceneManager* SceneManager, std::string name, std::string fil
 	testing = 0;
 	mDirection = Ogre::Vector3(-.05,0,0);//Ogre::Vector3::ZERO;
 	setupAnimations();
+	int count = mBodyEntity->getNumSubEntities();
+	for (int i = 0; i < count; i++){
+		mBodyEntity->getSubEntity(i)->getMaterial()->setColourWriteEnabled(true);
+		mBodyEntity->getSubEntity(i)->getMaterial()->setDiffuse(1,.6,1,1);
+		mBodyEntity->getSubEntity(i)->getMaterial()->setAmbient(1,.6,1);
+	}
 }
 
 void Robot::update(Ogre::Real deltaTime){
