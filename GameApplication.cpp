@@ -157,6 +157,7 @@ GameApplication::loadEnv()
 						agent->setPosition(grid.getPosition(i,j).x, 0, grid.getPosition(i,j).z);
 					}else {
 						Robot* robot = new Robot(this->mSceneMgr, getNewName(), rent->filename, rent->y, rent->scale, this);
+						robot->setPosition(grid.getPosition(i,j).x, 0, grid.getPosition(i,j).z);
 						RobotList.push_back(robot);
 					}
 					//agent->setApp(this);  //in constructor

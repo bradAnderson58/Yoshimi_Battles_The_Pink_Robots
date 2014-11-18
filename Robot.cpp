@@ -13,12 +13,14 @@ Robot::Robot(Ogre::SceneManager* SceneManager, std::string name, std::string fil
 		Ogre::AnimationState *a = iter.getNext();
 	}
 
+	//mBodyNode->yaw(Ogre::Degree(180)); //fish goes this way
+	//mBodyNode->pitch(Ogre::Degree(180));
 	Ogre::AxisAlignedBox uhh = mBodyEntity->getBoundingBox();
 	mSceneMgr->showBoundingBoxes(true);
 	mBodyNode->showBoundingBox(false);
 	counter = 0;
 	testing = 0;
-	mDirection = Ogre::Vector3::ZERO;
+	mDirection = Ogre::Vector3(-.05,0,0);//Ogre::Vector3::ZERO;
 	setupAnimations();
 }
 
@@ -36,7 +38,7 @@ void Robot::updateLocomote(Ogre::Real deltaTime){
 		}
 		mTimer = 0;
 		//always rotating
-		Ogre::Vector3 src = mBodyNode->getOrientation() * Ogre::Vector3::UNIT_Z;//rotate for first location
+		Ogre::Vector3 src = mBodyNode->getOrientation() * Ogre::Vector3::UNIT_X;//rotate for first location
 		if ((1.0f + src.dotProduct(mDirection)) < 0.0001f) 
 		{
 			mBodyNode->yaw(Ogre::Degree(180));
@@ -146,7 +148,75 @@ void Robot::setAnimation(AnimID id, bool reset){
 }
 
 Ogre::Vector3 Robot::flockingNormal(){				//need to add stuff to gameapplication
-	return Ogre::Vector3::ZERO;
+	Ogre::Vector3 seperation(0,0,0);
+	Ogre::Vector3 alignment(0,0,0);
+	Ogre::Vector3 cohesion(0,0,0);
+	Ogre::Vector3 centerMass(0,0,0);
+	Ogre::Vector3 vel;
+	Ogre::Vector3 temp;
+	Ogre::Vector3 temp2;
+	Ogre::Vector3 diff;
+	float diffMag;
+	float dist;
+	float radius = 100;
+	float weight;
+	float weightsum = 0;
+	std::list<Robot*> agents = app->getRobotList();
+	std::list<Robot*>::iterator aIter;
+	Ogre::Vector3 omgwork = Ogre::Vector3::ZERO;
+	//if the games walklist isn't empty
+	omgwork = app->getHousePointer()->getPosition();
+	//loop through agents
+	temp = mBodyNode->getPosition();
+	for (aIter = agents.begin(); aIter != agents.end(); aIter++){
+		//to not pick itself
+		if (this != (*aIter)){
+			//calc the weight....maybe later
+			weight = 1;
+			temp2 = (*aIter)->getPosition();
+			//get the distance between agents
+			dist = sqrt(pow((temp[0] - temp2[0]), 2) + pow((temp[1] - temp2[1]), 2) + pow((temp[2] - temp2[2]), 2));
+			//if distance is inside the radius of sight
+			if (dist < radius){
+				weight = 1 - (dist/radius); //weight should be higher the closer the object is
+				//calculate seperation portion
+				diff[0] = temp[0] - temp2[0];
+				diff[1] = temp[1] - temp2[1];
+				diff[2] = temp[2] - temp2[2];
+				diffMag = sqrt(pow(diff[0], 2) + pow(diff[1],2) + pow(diff[2], 2));
+				seperation += weight * (diff/(diffMag*diffMag));
+				//calculate alignment portion	
+				alignment += weight * (*aIter)->mDirection;
+				weightsum += weight;
+				//calculate center of mass for cohesion
+				centerMass += weight * (*aIter)->getPosition();
+			}
+		}
+	}
+	//stupid weight sum fix
+	if (weightsum != 0){
+		//finishing alignment calc and setting height to zero so no flying
+		alignment = alignment/weightsum;
+		alignment[1] = 0;
+		//finishing center of mass and cohesion and setting height to zero so no flying
+		centerMass = centerMass/weightsum;
+		cohesion = centerMass - mBodyNode->getPosition();
+		cohesion[1] = 0;
+	}
+	//adding a force for moving towards a goal
+	omgwork = omgwork - mBodyNode->getPosition();
+	//if an agent is close enough to the goal pop it off the queue
+	if(sqrt(pow(omgwork[0], 2) + pow(omgwork[1], 2) + pow(omgwork[2], 2)) < 40){
+		return Ogre::Vector3::ZERO;
+	}
+	//normalise the difference vector so you can limit the speed better
+	omgwork.normalise();
+	omgwork[1] = 0;
+
+	//the constants and parts of the velocity put together.
+	vel = .01 * alignment + 2.5 * seperation + .1 * cohesion +  .05 * omgwork;
+
+	return vel;
 }
 
 Ogre::Vector3 Robot::flockingFlee(){

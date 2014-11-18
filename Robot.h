@@ -18,6 +18,7 @@ public:
 	void update(Ogre::Real deltaTime);		// update hero!
 	void updateLocomote(Ogre::Real deltaTime);
 	void setMovement(char dir, bool on); //set the movemnt
+	Ogre::Vector3 getPosition(){return mBodyNode->getPosition();}
 
 private:
 	enum AnimID
