@@ -35,7 +35,7 @@ Yoshimi::Yoshimi(Ogre::SceneManager* SceneManager, std::string name, std::string
 	//mAttackNode->scale(0.2f,0.2f,0.2f); // cube is 100 x 100
 	//grid.getNode(i,j)->setOccupied();  // indicate that agents can't pass through
 	mAttackNode->setPosition(0.0f ,100.0f, -100.0f);
-	mAttackNode->setVisible(true);
+	mAttackNode->setVisible(false);
 	mAttackNode->showBoundingBox(true);
 	
 	//mAttackNode->attachObject(cube);
