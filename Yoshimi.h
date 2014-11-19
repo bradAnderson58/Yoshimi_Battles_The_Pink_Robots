@@ -21,6 +21,8 @@ public:
 
 	bool doingStuff;		//if Yoshimi is currently doing a non-looping animation
 	void changeSpeed(double s) { speed = s; }	//change the speed for different animations
+
+	void checkHits(char attack);  //for attacks - check if a robot gets hit
 private:
 	bool fForward; //how am I moving? Each flag indicates a direction
 	bool fBackward;
@@ -28,7 +30,8 @@ private:
 	bool fLeft;
 	double speed;	//how fast to move
 
-	Ogre::SceneNode* mAttackNode;	//use this for bounding area for Yoshimi attacks
+	Ogre::SceneNode *mAttackNode;	//use this for bounding area for Yoshimi attacks
+	Ogre::Entity *mAttackEntity;
 
 	enum AnimID
 	{

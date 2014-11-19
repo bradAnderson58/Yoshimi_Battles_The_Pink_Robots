@@ -20,6 +20,10 @@ public:
 	void setMovement(char dir, bool on); //set the movemnt
 	Ogre::Vector3 getPosition(){return mBodyNode->getPosition();}
 
+	Ogre::AxisAlignedBox getBoundingBox() { return mBodyEntity->getWorldBoundingBox(); }   //Yoshimi checks this to see if hit
+	void getHit(char attack, Ogre::Vector3 dir);		//Here will be code to react to being hit by Yoshimi
+	void setFlyback(int velocity,  Ogre::Vector3 dir);		//Here we will knock a robot back
+
 private:
 	enum AnimID
 	{
@@ -51,6 +55,8 @@ private:
 	Ogre::Vector3 flockingFlee();
 	Ogre::Vector3 flockingSeek();
 	Ogre::Vector3 flockingLeader();
+
+	bool flying;		//if the robot is in the process of being knocked back
 
 };
 

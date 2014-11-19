@@ -28,18 +28,15 @@ Yoshimi::Yoshimi(Ogre::SceneManager* SceneManager, std::string name, std::string
 
 	//attack space
 	mAttackNode = mBodyNode->createChildSceneNode();
-	Ogre::Entity* cube = mSceneMgr->createEntity("attackCube", Ogre::SceneManager::PT_CUBE);
-	cube->setMaterialName("Examples/RustySteel");
-	mAttackNode->attachObject(cube);
+	mAttackEntity = mSceneMgr->createEntity("attackCube", Ogre::SceneManager::PT_CUBE);
+	mAttackEntity->setMaterialName("Examples/RustySteel");
+	mAttackNode->attachObject(mAttackEntity);
 	
-	//mAttackNode->scale(0.2f,0.2f,0.2f); // cube is 100 x 100
-	//grid.getNode(i,j)->setOccupied();  // indicate that agents can't pass through
+	//set up the position of the attackNode
 	mAttackNode->setPosition(0.0f ,100.0f, -100.0f);
 	mAttackNode->setVisible(false);
-	mAttackNode->showBoundingBox(true);
+	mAttackNode->showBoundingBox(true);  //for testing
 	
-	//mAttackNode->attachObject(cube);
-
 	//use this to check animations if needed
 	/*Ogre::AnimationStateSet* aSet = mBodyEntity->getAllAnimationStates();
 	Ogre::AnimationStateIterator iter = mBodyEntity->getAllAnimationStates()->getAnimationStateIterator();
@@ -204,4 +201,26 @@ void Yoshimi::buttonAnimation(char key){
 	else if (key == 't') setAnimation(ATTACK_ONE, true);  //throw fishbomb
 	else if (key == 's') setAnimation(ATTACK_THREE, true);//use sword
 	else if (key == 'k') setAnimation(KICK, true);		  //judo-kick
+}
+
+//Yoshimi checks the robot list to see if any robots are close enough to hit
+//If so, they get hurted and such
+//TODO: Optimize so that Yoshimi only has to check a certain amount of robots?  Octree?
+void Yoshimi::checkHits(char attack){
+	std::cout << "We are in checkHits" << std::endl;
+	Ogre::AxisAlignedBox aRange = mAttackEntity->getWorldBoundingBox();
+	Ogre::AxisAlignedBox rRange;
+
+	for (Robot *robot : app->getRobotList()){
+
+		rRange = robot->getBoundingBox();
+
+		std::cout << rRange.intersects(aRange) << std::endl;
+
+		if (aRange.intersects(rRange)){
+			std::cout << "Im hitting the robot" << std::endl;
+			robot->getHit(attack, mDirection);
+		}
+	}
+
 }

@@ -28,12 +28,31 @@ Robot::Robot(Ogre::SceneManager* SceneManager, std::string name, std::string fil
 		mBodyEntity->getSubEntity(i)->getMaterial()->setDiffuse(1,.6,1,1);
 		mBodyEntity->getSubEntity(i)->getMaterial()->setAmbient(1,.6,1);
 	}
+
+	flying = false;
 }
 
 void Robot::update(Ogre::Real deltaTime){
-	this->updateAnimations(deltaTime);	// Update animation playback
-	this->updateLocomote(deltaTime);	// Update Locomotion
+	if (!flying){
+		this->updateAnimations(deltaTime);	// Update animation playback
+		this->updateLocomote(deltaTime);	// Update Locomotion
+	}
 
+	//Knockback code (similar to fish 'shoot' method
+	else{
+		using namespace Ogre;
+
+		Vector3 pos = this->mBodyNode->getPosition();
+		vel = vel + (gravity * deltaTime);
+		pos = pos + (vel * deltaTime); // velocity
+		pos = pos + 0.5 * gravity * deltaTime * deltaTime; // acceleration
+
+		this->mBodyNode->setPosition(pos);
+
+		if (this->mBodyNode->getPosition().y <= 0){
+			flying = false;
+		}
+	}
 }
 
 void Robot::updateLocomote(Ogre::Real deltaTime){
@@ -233,4 +252,38 @@ Ogre::Vector3 Robot::flockingSeek(){
 }
 Ogre::Vector3 Robot::flockingLeader(){
 	return Ogre::Vector3::ZERO;
+}
+
+//Here the robot reacts when hit by Yoshimi
+void Robot::getHit(char attack, Ogre::Vector3 dir){
+
+	//different reactions for different attacks
+	//This is sword attack
+	if (attack == 's'){
+		setAnimation(SLUMP);
+		//do some health stuff
+		setFlyback(5, dir);
+
+	}else if (attack == 'k'){
+		setAnimation(SLUMP);
+		//do some health stuff
+		setFlyback(15, dir);
+	}
+}
+
+//Similar to 'fire' method in fish game.  We will knock this robot back
+void Robot::setFlyback(int velocity,Ogre::Vector3 dir){
+
+	flying = true;
+
+	// set up the initial state
+	initPos = this->mBodyNode->getPosition();
+	vel.x = -dir[0] * velocity;									
+	vel.y = 0.707 * velocity;				//y and z values are determined by the angle of trajectory multiplied by velocity
+	vel.z = -dir[2] * velocity;
+
+	//gravity
+	gravity.x = 0;
+	gravity.y = -9.81;
+	gravity.z = 0;
 }

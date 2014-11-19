@@ -424,10 +424,12 @@ bool GameApplication::mousePressed( const OIS::MouseEvent &arg, OIS::MouseButton
 		yoshPointer->changeSpeed(1);
 		yoshPointer->buttonAnimation('s');
 		yoshPointer->doingStuff = true;
+		yoshPointer->checkHits('s');
 	}
 	else if (id == OIS::MB_Right && !yoshPointer->doingStuff){
 		yoshPointer->buttonAnimation('k');
 		yoshPointer->doingStuff = true;
+		yoshPointer->checkHits('k');
 	}
 	//////////////////////////////////////////////////////////////////////////////////////
    
