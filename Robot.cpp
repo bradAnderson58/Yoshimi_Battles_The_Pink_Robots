@@ -30,16 +30,20 @@ Robot::Robot(Ogre::SceneManager* SceneManager, std::string name, std::string fil
 	}
 
 	flying = false;
+	dead = false;
+	health = 100;
 }
 
 void Robot::update(Ogre::Real deltaTime){
-	if (!flying){
-		this->updateAnimations(deltaTime);	// Update animation playback
+
+	this->updateAnimations(deltaTime);	// Update animation playback
+	if (!flying && !dead){
+										  	// Update animation playback
 		this->updateLocomote(deltaTime);	// Update Locomotion
 	}
 
-	//Knockback code (similar to fish 'shoot' method
-	else{
+	//Knockback code (similar to fish 'shoot' method)
+	else if (!dead){
 		using namespace Ogre;
 
 		Vector3 pos = this->mBodyNode->getPosition();
@@ -50,7 +54,9 @@ void Robot::update(Ogre::Real deltaTime){
 		this->mBodyNode->setPosition(pos);
 
 		if (this->mBodyNode->getPosition().y <= 0){
+			mBodyNode->setPosition(mBodyNode->getPosition().x, 0, mBodyNode->getPosition().z);
 			flying = false;
+			if (health <= 0) setDeath();
 		}
 	}
 }
@@ -183,7 +189,7 @@ Ogre::Vector3 Robot::flockingNormal(){				//need to add stuff to gameapplication
 	Ogre::Vector3 diff;
 	float diffMag;
 	float dist;
-	float radius = 100;
+	float radius = 50;
 	float weight;
 	float weightsum = 0;
 	std::list<Robot*> agents = app->getRobotList();
@@ -195,7 +201,8 @@ Ogre::Vector3 Robot::flockingNormal(){				//need to add stuff to gameapplication
 	temp = mBodyNode->getPosition();
 	for (aIter = agents.begin(); aIter != agents.end(); aIter++){
 		//to not pick itself
-		if (this != (*aIter)){
+		//Also: dont use robots who are in the air, it screws everything up!
+		if (this != (*aIter) && (*aIter)->notFlying() && (*aIter)->notDead()){
 			//calc the weight....maybe later
 			weight = 1;
 			temp2 = (*aIter)->getPosition();
@@ -239,7 +246,7 @@ Ogre::Vector3 Robot::flockingNormal(){				//need to add stuff to gameapplication
 	omgwork[1] = 0;
 
 	//the constants and parts of the velocity put together.
-	vel = .01 * alignment + 2.5 * seperation + .1 * cohesion +  .05 * omgwork;
+	vel = .01 * alignment + 2.5 * seperation + .01 * cohesion +  .05 * omgwork;
 
 	return vel;
 }
@@ -260,13 +267,13 @@ void Robot::getHit(char attack, Ogre::Vector3 dir){
 	//different reactions for different attacks
 	//This is sword attack
 	if (attack == 's'){
-		setAnimation(SLUMP);
-		//do some health stuff
+		setAnimation(SLUMP, true);
+		health -= 10;
 		setFlyback(5, dir);
 
 	}else if (attack == 'k'){
-		setAnimation(SLUMP);
-		//do some health stuff
+		setAnimation(SLUMP, true);
+		health -= 20;
 		setFlyback(15, dir);
 	}
 }
@@ -286,4 +293,11 @@ void Robot::setFlyback(int velocity,Ogre::Vector3 dir){
 	gravity.x = 0;
 	gravity.y = -9.81;
 	gravity.z = 0;
+}
+
+//this probably didnt need to be its own method
+void Robot::setDeath(){
+	setAnimation(DIE);
+	dead = true;
+
 }

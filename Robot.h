@@ -11,6 +11,7 @@ public:
 
 	int counter;
 	int testing;
+	
 
 	Robot(Ogre::SceneManager* SceneManager, std::string name, std::string filename, float height, float scale, GameApplication* a);
 	~Robot();
@@ -23,8 +24,13 @@ public:
 	Ogre::AxisAlignedBox getBoundingBox() { return mBodyEntity->getWorldBoundingBox(); }   //Yoshimi checks this to see if hit
 	void getHit(char attack, Ogre::Vector3 dir);		//Here will be code to react to being hit by Yoshimi
 	void setFlyback(int velocity,  Ogre::Vector3 dir);		//Here we will knock a robot back
+	void setDeath();
+
+	bool notFlying() { return !flying; }  //returns true if flying is false -dp exclusive
+	bool notDead() { return !dead; }     //or dead
 
 private:
+
 	enum AnimID
 	{
 		DIE,
@@ -57,7 +63,8 @@ private:
 	Ogre::Vector3 flockingLeader();
 
 	bool flying;		//if the robot is in the process of being knocked back
-
+	int health;			//this is robot health
+	bool dead;			//dead robot
 };
 
 #endif
