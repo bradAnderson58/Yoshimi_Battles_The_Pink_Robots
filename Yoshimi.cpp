@@ -8,6 +8,7 @@ Yoshimi::Yoshimi(Ogre::SceneManager* SceneManager, std::string name, std::string
 {
 	//origin
 	mBodyNode->setPosition(0.0,0.0,0.0);
+	mBodyNode->yaw(Ogre::Radian(M_PI));
 
 	//Camera set up here
 	Ogre::Vector3 temp(mBodyNode->getPosition());

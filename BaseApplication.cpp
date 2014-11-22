@@ -136,7 +136,7 @@ void BaseApplication::createFrameListener(void)
 	mTrayMgr = new OgreBites::SdkTrayManager("InterfaceName", mWindow, input, this);*/
 
 	//Fix for 1.9 - put this in:
-	mTrayMgr = new OgreBites::SdkTrayManager("InterfaceName", mWindow, mInputContext, this);
+	mTrayMgr = new OgreBites::SdkTrayManager("InterfaceName", mWindow, mInputContext, this);  //COMMENTED THIS OUT!!
 	//mTrayMgr = new OgreBites::SdkTrayManager("InterfaceName", mWindow, mMouse, this);
     mTrayMgr->showFrameStats(OgreBites::TL_BOTTOMLEFT);
     //mTrayMgr->showLogo(OgreBites::TL_BOTTOMRIGHT);
@@ -211,6 +211,19 @@ void BaseApplication::createResourceListener(void)
 //-------------------------------------------------------------------------------------
 void BaseApplication::loadResources(void)
 {
+
+	//createFrameListener();
+	///mTrayMgr->showLoadingBar(); 
+	//loadResources();
+	//mTrayMgr->hideLoadingBar();
+	//createScene();
+	//m_loading_bar->start(mWindow, 1, 1, 0.75);
+    //OgreBites::SdkTrayManager::showLoadingBar;
+	// Initialise, parse scripts etc
+	//Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
+    //OgreBites::SdkTrayManager::hideLoadingBar;
+	//m_loading_bar->finish();
+
     Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 }
 //-------------------------------------------------------------------------------------
@@ -249,15 +262,28 @@ bool BaseApplication::setup(void)
     // Set default mipmap level (NB some APIs ignore this)
     Ogre::TextureManager::getSingleton().setDefaultNumMipmaps(5);
 
-    // Create any resource listeners (for loading screens)
+	//Need this for the loading bar?
+	Ogre::ResourceGroupManager::getSingleton().initialiseResourceGroup("Essential");
+
+    // Create any resource listeners (for loading screens)  This could be helpful?
     createResourceListener();
+
     // Load resources
-    loadResources();
+	//mTrayMgr should be initialized in the Frame Listener
+	createFrameListener();
+	
+	//mTrayMgr = new OgreBites::SdkTrayManager("InterfaceName", mWindow, mInputContext, this);
+	mTrayMgr->showLoadingBar(); 
+	loadResources();
+	mTrayMgr->hideLoadingBar();
+
+	createScene();
+    //loadResources();
 
     // Create the scene
-    createScene();
+    //createScene();
 
-    createFrameListener();
+    //createFrameListener();
 
 	createGUI();  //my guis
 

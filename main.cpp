@@ -1,5 +1,4 @@
 #include "GameApplication.h"
-
 #include "windows.h"
 
 
@@ -9,6 +8,7 @@ extern "C" {
 
 int main(int argc, char *argv[])
     {
+
         // Create application object
         GameApplication app;
 
