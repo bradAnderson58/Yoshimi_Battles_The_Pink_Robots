@@ -23,6 +23,8 @@ public:
 	void changeSpeed(double s) { speed = s; }	//change the speed for different animations
 
 	void checkHits(char attack);  //for attacks - check if a robot gets hit
+	void checkBump();
+
 private:
 	bool fForward; //how am I moving? Each flag indicates a direction
 	bool fBackward;

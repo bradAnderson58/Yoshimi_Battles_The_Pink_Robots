@@ -3,6 +3,7 @@
 #define _USE_MATH_DEFINES   
 #include <math.h>
 
+
 Robot::Robot(Ogre::SceneManager* SceneManager, std::string name, std::string filename, float height, float scale, GameApplication* a):
 	Agent(SceneManager, name, filename, height, scale, a)
 {
@@ -35,7 +36,7 @@ Robot::Robot(Ogre::SceneManager* SceneManager, std::string name, std::string fil
 }
 
 void Robot::update(Ogre::Real deltaTime){
-
+	
 	this->updateAnimations(deltaTime);	// Update animation playback
 	if (!flying && !dead){
 										  	// Update animation playback
@@ -100,6 +101,10 @@ void Robot::updateAnimations(Ogre::Real deltaTime){
 
 	if (robAnim != ANIM_NONE){
 		mAnims[robAnim]->addTime(deltaTime * 1);
+		if (mAnims[robAnim]->hasEnded()){
+			std::cout << "END" << std::endl;
+			setAnimation(ANIM_NONE);
+		}
 	}
 	//transitions
 	//fadeAnimations(deltaTime);
@@ -175,6 +180,7 @@ void Robot::setAnimation(AnimID id, bool reset){
 	{
 		// if we have a new animation, enable it and fade it in
 		mAnims[id]->setEnabled(true);
+		if (reset) mAnims[id]->setTimePosition(0);
 	}
 }
 

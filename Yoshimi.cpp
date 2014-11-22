@@ -198,7 +198,7 @@ void Yoshimi::buttonAnimation(char key){
 	if (key == 'j'){
 		setAnimation(JUMP, true);
 	}
-	else if (key == 't') setAnimation(ATTACK_ONE, true);  //throw fishbomb
+	else if (key == 't') setAnimation(ATTACK_ONE, true);  //throw fishbomb?
 	else if (key == 's') setAnimation(ATTACK_THREE, true);//use sword
 	else if (key == 'k') setAnimation(KICK, true);		  //judo-kick
 }
@@ -207,19 +207,16 @@ void Yoshimi::buttonAnimation(char key){
 //If so, they get hurted and such
 //TODO: Optimize so that Yoshimi only has to check a certain amount of robots?  Octree?
 void Yoshimi::checkHits(char attack){
-	std::cout << "We are in checkHits" << std::endl;
+	
+	//get bounding boxes for Yoshimi and her adversaries
 	Ogre::AxisAlignedBox aRange = mAttackEntity->getWorldBoundingBox();
 	Ogre::AxisAlignedBox rRange;
 
 	for (Robot *robot : app->getRobotList()){
-
 		rRange = robot->getBoundingBox();
 
-		std::cout << rRange.intersects(aRange) << std::endl;
-
 		if (aRange.intersects(rRange)){
-			std::cout << "Im hitting the robot" << std::endl;
-			robot->getHit(attack, mDirection);
+			robot->getHit(attack, mDirection);	//hit em
 		}
 	}
 
