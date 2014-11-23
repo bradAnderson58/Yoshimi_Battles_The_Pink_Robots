@@ -11,7 +11,23 @@ GameApplication::GameApplication(void):
 {
 	agent = NULL; // Init member data
 	housePointer = NULL;
+	startGame = false;
 	
+	//set up these strings for later usages
+	std::stringstream ins;	// a stream for outputing to a string (why no clear()?)
+	std::stringstream cre;
+	ins << "\nYour name is Yoshimi, you're a blackbelt in Karate";
+	ins << "\nMOVE: WASD moves Yoshimi as you would expect.  Mouse movements rotate Yoshimi to face different directions.";
+	ins <<"\nATTACK: Left mouse click executes Judo Sword Attack, right mouse click executes Epic Front Kick.";
+	ins <<"\n\nOBJECTIVE:  You must protect your house from the evil natured Robots, who are programmed to destroy us!";
+	instruction = ins.str();
+	//out.clear();
+
+	cre << "\nInspiration and music taken from \"Yoshimi Battles the Pink Robots\" by The Flaming Lips.";
+	cre << "\nGraphics made with assistance of the Ogre Rendering Engine API.";
+	cre << "\nLEAD DEVELOPERS:  Brad Anderson and Kevin Dec, \nDangling Pointers LLC";
+	credits = cre.str();
+
 }
 //-------------------------------------------------------------------------------------
 GameApplication::~GameApplication(void)
@@ -23,8 +39,9 @@ GameApplication::~GameApplication(void)
 //-------------------------------------------------------------------------------------
 void GameApplication::createScene(void)
 {
-    loadEnv();
-	setupEnv();
+	message();
+    /*loadEnv();
+	setupEnv();*/  //DO THIS ELSEWHERE?
 	//loadObjects();
 	//loadCharacters();
 	//////////////////////////////////////////////////////////////////////////////////
@@ -263,7 +280,7 @@ GameApplication::addTime(Ogre::Real deltaTime)
 		if (*iter != NULL)
 			(*iter)->update(deltaTime);
 
-	yoshPointer->update(deltaTime); //Yoshimi has a different update function
+	if (startGame) yoshPointer->update(deltaTime); //Yoshimi has a different update function
 	
 }
 
@@ -408,38 +425,46 @@ bool GameApplication::mouseMoved( const OIS::MouseEvent &arg )
 	//std::cout << arg.state.X << std::endl;
 	//std::cout << arg.state.Y << std::endl;
 
-	yoshPointer->rotationCode(arg);
+	if (startGame) yoshPointer->rotationCode(arg);
 	
-    //if (mTrayMgr->injectMouseMove(arg)) return true;
+    if (mTrayMgr->injectMouseMove(arg)) return true;
     //mCameraMan->injectMouseMove(arg);
     return true;
 }
 
 bool GameApplication::mousePressed( const OIS::MouseEvent &arg, OIS::MouseButtonID id )
 {
-	//////////////////////////////////////////////////////////////////////////////////////
-	// attack using left and right mouse buttons
-	if(id == OIS::MB_Left && !yoshPointer->doingStuff)
-	{
-		yoshPointer->changeSpeed(1);
-		yoshPointer->buttonAnimation('s');
-		yoshPointer->doingStuff = true;
-		yoshPointer->checkHits('s');
+	/////////////////////////////////////////////////////////////////////////////////////
+	// attack using left and right mouse buttons once the game starts
+	if (startGame){
+		if(id == OIS::MB_Left && !yoshPointer->doingStuff)
+		{
+			yoshPointer->changeSpeed(1);
+			yoshPointer->buttonAnimation('s');
+			yoshPointer->doingStuff = true;
+			yoshPointer->checkHits('s');
+		}
+		else if (id == OIS::MB_Right && !yoshPointer->doingStuff){
+			yoshPointer->buttonAnimation('k');
+			yoshPointer->doingStuff = true;
+			yoshPointer->checkHits('k');
+		}
 	}
-	else if (id == OIS::MB_Right && !yoshPointer->doingStuff){
-		yoshPointer->buttonAnimation('k');
-		yoshPointer->doingStuff = true;
-		yoshPointer->checkHits('k');
-	}
-	//////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////
    
-    //if (mTrayMgr->injectMouseDown(arg, id)) return true;
+	if (id == OIS::MB_Right) bRMouseDown = false;
+	else if (id == OIS::MB_Left) bLMouseDown = false;
+    if (mTrayMgr->injectMouseDown(arg, id)) return true;
     //mCameraMan->injectMouseDown(arg, id);
     return true;
 }
 
 bool GameApplication::mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id )
 {
+	if (id == OIS::MB_Right) bRMouseDown = false;
+	else if (id == OIS::MB_Left) bLMouseDown = false;
+	std::cout << "release me!?" << std::endl;
+	if (mTrayMgr->injectMouseUp(arg, id)) return true;
     return true;
 }
 
@@ -452,20 +477,101 @@ void GameApplication::createGUI(void)
 
 	std::string label = "Trajectory"; 
 	
-	//The slider will be used to get the value of the trajectory and the velocity
-	/*mSlider = mTrayMgr->createThickSlider(TL_TOP, "SampleSlider", label, 250, 80, 0, 0, 0);
-	mSlider->setRange(0, 100, 101); //so the third parmeter for this method was not what i was expecting: much confuse
-	mSlider->setValue(50);
-	mTrayMgr->sliderMoved(mSlider);*/
+	/*The slider will be used to get the value of the trajectory and the velocity
+	OgreBites::Slider *mS = mTrayMgr->createThickSlider(TL_TOP, "SampleSlider", label, 250, 80, 0, 0, 0);
+	mS->setRange(0, 100, 101); //so the third parmeter for this method was not what i was expecting: much confuse
+	mS->setValue(50);
+	mTrayMgr->sliderMoved(mS);*/
+	OgreBites::Label *title = mTrayMgr->createLabel(TL_CENTER, "Title", "Yoshimi Battles The Pink Robots", 500.0f);
+	mTrayMgr->createSeparator(TL_CENTER,"sep", 500.0f);
 	
+	cont = mTrayMgr->createButton(TL_CENTER, "ClickMe", "Play", 200.0);
+	mTrayMgr->buttonHit(cont);
+	//cont->show();
+
+	inst = mTrayMgr->createButton(TL_CENTER, "instruct", "Instructions", 200.0);
+	mTrayMgr->buttonHit(inst);
+	//inst->show();
+
+	cred = mTrayMgr->createButton(TL_CENTER, "credit", "Credits", 200.0);
+	mTrayMgr->buttonHit(cred);
+
+	texty = mTrayMgr->createTextBox(TL_CENTER, "text", "", 300.0, 200.0);
+	//texty->setText("Some test Text");
+	texty->hide();
+
+	back = mTrayMgr->createButton(TL_CENTER, "back", "Back", 200.0);
+	mTrayMgr->buttonHit(back);
+	back->hide();
+
 	//use the paramsPanel to display number of successful shots
 	Ogre::StringVector items;
 	items.push_back("Yoshimi");
 	mParamsPanel = mTrayMgr->createParamsPanel(OgreBites::TL_TOPRIGHT,"Testing",250,items);
 	mParamsPanel->setParamValue(0, Ogre::StringConverter::toString(0));
 
-	mTrayMgr->showAll();
+	//mTrayMgr->showAll();
+	
 
 	//////////////////////////////////////////////////////////////////////////////////
 }
 
+void GameApplication::buttonHit(OgreBites::Button* b)
+{
+	std::cout << "Gots here" << std::endl;
+	if (b->getName() == "ClickMe")
+	{
+		//Delete start GUI and start game
+		if (!startGame){
+			mTrayMgr->destroyAllWidgetsInTray(OgreBites::TL_CENTER); //going to remove
+			loadEnv();
+			setupEnv();
+			startGame = true;
+		}
+	}
+	else if (b->getName() == "instruct")
+	{
+		//hide what we dont need
+		cont->hide();
+		inst->hide();
+		cred->hide();
+
+		//set up text
+		texty->setCaption("Instructions");
+		texty->clearText();
+		texty->setText(instruction);
+			
+		texty->show();
+		back->show();
+	
+	}else if (b->getName() == "credit"){
+		//hide shit we dont need
+		cont->hide();
+		inst->hide();
+		cred->hide();
+
+		//set text box ups
+		texty->setCaption("Credits");
+		texty->clearText();
+		texty->setText(credits);
+
+		//show stuff we want
+		texty->show();
+		back->show();
+
+	}else if (b->getName() == "back"){
+		cont->show();
+		inst->show();
+		cred->show();
+		texty->hide();
+		back->hide();
+	}
+}
+
+
+void GameApplication::message(){
+
+	//while (!startGame){
+
+	//}
+}

@@ -62,6 +62,23 @@ protected:
     virtual void createScene(void);
 
 	virtual void createGUI(void);  //for gui's
+
+	void buttonHit(OgreBites::Button *b);
+
+	void message();  //test this out real quick
+	bool startGame;	//start button
+
+	//GUI buttons
+	OgreBites::Button *cont;
+	OgreBites::Button *inst;
+	OgreBites::Button *cred;
+	OgreBites::TextBox *texty;
+	OgreBites::Button *back;
+
+	//Strings for GUI
+	std::string instruction;
+	std::string credits;
+	
 	OgreBites::ParamsPanel* mParamsPanel;
 
 };
