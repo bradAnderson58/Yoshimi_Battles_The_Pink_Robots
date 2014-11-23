@@ -28,6 +28,10 @@ GameApplication::GameApplication(void):
 	cre << "\nLEAD DEVELOPERS:  Brad Anderson and Kevin Dec, \nDangling Pointers LLC";
 	credits = cre.str();
 
+	music = __FILE__; //gets the current cpp file's path with the cpp file
+	music = music.substr(0,1+music.find_last_of('\\')); //removes filename to leave path
+	music+= "\\Sounds\\YBPR_part2.wav"; //if txt file is in the same directory as cpp file
+
 }
 //-------------------------------------------------------------------------------------
 GameApplication::~GameApplication(void)
@@ -80,6 +84,9 @@ GameApplication::loadEnv()
 		float orient;
 		bool agent;
 	};
+
+	PlaySound(music.c_str(), NULL, SND_FILENAME|SND_ASYNC);
+
 	GridNode *temp;  //FOR TESTING REMOVE
 
 	ifstream inputfile;		// Holds a pointer into the file
@@ -523,6 +530,7 @@ void GameApplication::buttonHit(OgreBites::Button* b)
 	{
 		//Delete start GUI and start game
 		if (!startGame){
+			PlaySound(NULL, NULL, SND_FILENAME|SND_ASYNC);
 			mTrayMgr->destroyAllWidgetsInTray(OgreBites::TL_CENTER); //going to remove
 			loadEnv();
 			setupEnv();

@@ -79,6 +79,9 @@ protected:
 	std::string instruction;
 	std::string credits;
 	
+	//Path files for sounds
+	std::string music;
+
 	OgreBites::ParamsPanel* mParamsPanel;
 
 };
