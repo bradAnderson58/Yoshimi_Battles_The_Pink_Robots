@@ -70,6 +70,7 @@ private:
 	bool dead;			//dead robot
 	bool atLocation;
 	bool goRight;
+	bool fleeSet;
 };
 
 #endif

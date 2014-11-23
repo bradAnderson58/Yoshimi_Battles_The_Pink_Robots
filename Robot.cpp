@@ -33,6 +33,7 @@ Robot::Robot(Ogre::SceneManager* SceneManager, std::string name, std::string fil
 	flying = false;
 	dead = false;
 	atLocation = false;
+	fleeSet = false;
 	health = 100;
 	if(rand() % 2 == 0){
 		goRight = true;
@@ -70,7 +71,18 @@ void Robot::update(Ogre::Real deltaTime){
 }
 
 void Robot::updateLocomote(Ogre::Real deltaTime){
-	mDirection = flockingNormal();//get the flocking velocity
+	Ogre::Vector3 yoshPos = app->getYoshimiPointer()->getPosition();
+	if (mBodyNode->getPosition().distance(yoshPos) < 20){
+		//std::cout << "FLEEING:: " << std::endl;
+			mDirection = flockingFlee();
+			atLocation = true;
+		//}
+	}
+	else{
+		fleeSet = false;
+		atLocation = false;
+		mDirection = flockingNormal();//get the flocking velocity
+	}
 	if (mDirection != Ogre::Vector3::ZERO){//if the velocity isnt zero set up animations
 		if (robAnim != WALK){
 			setAnimation(WALK);
@@ -268,7 +280,7 @@ Ogre::Vector3 Robot::flockingNormal(){				//need to add stuff to gameapplication
 	Ogre::Vector3 diff;
 	float diffMag;
 	float dist;
-	float radius = 50;
+	float radius = 20;
 	float weight;
 	float weightsum = 0;
 	std::list<Robot*> agents = app->getRobotList();
@@ -344,10 +356,19 @@ Ogre::Vector3 Robot::flockingNormal(){				//need to add stuff to gameapplication
 }
 
 Ogre::Vector3 Robot::flockingFlee(){
-	return Ogre::Vector3::ZERO;
+	Ogre::Vector3 yoshPos = app->getYoshimiPointer()->getPosition();
+	Ogre::Vector3 mPosition = mBodyNode->getPosition();
+	Ogre::Vector3 desired = (mPosition - yoshPos);
+	desired.normalise();
+	desired *= .05;
+	desired[1] = 0;
+	/*Ogre::Vector3 steer = desired - mDirection;
+	steer[1] = 0;
+	steer += mDirection*/ //if you wanna make it impossible to catch the guy;
+	return desired;
 }
 Ogre::Vector3 Robot::flockingSeek(){
-	return Ogre::Vector3::ZERO;
+	return flockingFlee() * -1;
 }
 Ogre::Vector3 Robot::flockingLeader(){
 	return Ogre::Vector3::ZERO;
