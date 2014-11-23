@@ -32,7 +32,14 @@ Robot::Robot(Ogre::SceneManager* SceneManager, std::string name, std::string fil
 
 	flying = false;
 	dead = false;
+	atLocation = false;
 	health = 100;
+	if(rand() % 2 == 0){
+		goRight = true;
+	}
+	else{
+		goRight = false;
+	}
 }
 
 void Robot::update(Ogre::Real deltaTime){
@@ -184,6 +191,74 @@ void Robot::setAnimation(AnimID id, bool reset){
 	}
 }
 
+Ogre::Vector3 Robot::getSpecificPos(){
+	Ogre::Vector3 housePos = app->getHousePointer()->getPosition();
+	std::list<Robot*> robots = app->getRobotList();
+
+	std::list<Ogre::Vector3> occupied;
+	std::list<Ogre::Vector3>::iterator oIter;
+
+	std::list<Robot*>::iterator rIter;
+	double angle = 0;
+	Ogre::Real c = cos(angle);
+	Ogre::Real s = sin(angle);
+	Ogre::Matrix3 rot(c,0,s,0,1,0,-s,0,c);
+
+	for (rIter = robots.begin(); rIter != robots.end(); rIter++){
+		if ( !(*rIter)->notAtLocation()){
+			//std::cout << "atLocation" << std::endl;
+			occupied.push_back((*rIter)->getPosition());
+		}
+	}
+
+	bool tooClose = false;
+	bool endLoop = true;
+	Ogre::Vector3 ret(0,0,0);
+	Ogre::Vector3 temp(0,0,0);
+	Ogre::Real dist = 0;
+	bool addAngle = false;
+	if(rand() % 2 == 0){
+		addAngle = true;
+	}
+
+	temp = mBodyNode->getPosition() - housePos;
+	temp.normalise();
+	ret = housePos + (temp * 40);
+	ret[1] = 0;
+
+	do{
+		//for (oIter = occupied.begin(); oIter != occupied.end(); oIter++){
+		for (Ogre::Vector3 thing : occupied){
+			temp = thing - ret;
+			dist = temp.length();
+			if (dist < 5){
+				tooClose = true;
+			}
+		}
+		if (tooClose){
+			if(goRight){
+				angle = -.05;
+			}
+			else{
+				angle += .05;
+			}
+			c = cos(angle);
+			s = sin(angle);
+			rot = Ogre::Matrix3(c,0,s,0,1,0,-s,0,c);
+			temp = ret - housePos;
+			temp = temp * rot;
+			ret = temp + housePos;
+			tooClose = false;
+		}
+		else{
+			std::cout << "ANGLE: " << angle << std::endl;
+			endLoop = false;
+		}
+	}while (endLoop);	
+	return ret;
+
+}
+
 Ogre::Vector3 Robot::flockingNormal(){				//need to add stuff to gameapplication
 	Ogre::Vector3 seperation(0,0,0);
 	Ogre::Vector3 alignment(0,0,0);
@@ -208,7 +283,7 @@ Ogre::Vector3 Robot::flockingNormal(){				//need to add stuff to gameapplication
 	for (aIter = agents.begin(); aIter != agents.end(); aIter++){
 		//to not pick itself
 		//Also: dont use robots who are in the air, it screws everything up!
-		if (this != (*aIter) && (*aIter)->notFlying() && (*aIter)->notDead()){
+		if (this != (*aIter) && (*aIter)->notFlying() && (*aIter)->notDead() && (*aIter)->notAtLocation()){
 			//calc the weight....maybe later
 			weight = 1;
 			temp2 = (*aIter)->getPosition();
@@ -243,12 +318,22 @@ Ogre::Vector3 Robot::flockingNormal(){				//need to add stuff to gameapplication
 	}
 	//adding a force for moving towards a goal
 	omgwork = omgwork - mBodyNode->getPosition();
+	Ogre::Real distance = omgwork.normalise();
 	//if an agent is close enough to the goal pop it off the queue
-	if(sqrt(pow(omgwork[0], 2) + pow(omgwork[1], 2) + pow(omgwork[2], 2)) < 40){
+	if(distance < 40){
+		atLocation = true;
 		return Ogre::Vector3::ZERO;
 	}
+	else if (distance < 100){
+		omgwork = getSpecificPos();
+		omgwork = omgwork - mBodyNode->getPosition();
+		omgwork.normalise();
+		return omgwork;
+	}
+	else{
+		atLocation = false;
+	}
 	//normalise the difference vector so you can limit the speed better
-	omgwork.normalise();
 	omgwork[1] = 0;
 
 	//the constants and parts of the velocity put together.

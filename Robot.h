@@ -28,6 +28,7 @@ public:
 
 	bool notFlying() { return !flying; }  //returns true if flying is false -dp exclusive
 	bool notDead() { return !dead; }     //or dead
+	bool notAtLocation(){return !atLocation;}
 
 private:
 
@@ -57,6 +58,8 @@ private:
 	void updateAnimations(Ogre::Real deltaTime);			// update the animation frame
 	void setAnimation(AnimID id, bool reset = false);
 
+	Ogre::Vector3 getSpecificPos();
+
 	Ogre::Vector3 flockingNormal();
 	Ogre::Vector3 flockingFlee();
 	Ogre::Vector3 flockingSeek();
@@ -65,6 +68,8 @@ private:
 	bool flying;		//if the robot is in the process of being knocked back
 	int health;			//this is robot health
 	bool dead;			//dead robot
+	bool atLocation;
+	bool goRight;
 };
 
 #endif
