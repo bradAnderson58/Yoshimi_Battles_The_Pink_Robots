@@ -29,11 +29,12 @@ Robot::Robot(Ogre::SceneManager* SceneManager, std::string name, std::string fil
 		mBodyEntity->getSubEntity(i)->getMaterial()->setDiffuse(1,.6,1,1);
 		mBodyEntity->getSubEntity(i)->getMaterial()->setAmbient(1,.6,1);
 	}
-
+	state = NORMAL;
 	flying = false;
 	dead = false;
 	atLocation = false;
 	fleeSet = false;
+	closeFriendDied = false;
 	health = 100;
 	if(rand() % 2 == 0){
 		goRight = true;
@@ -44,18 +45,24 @@ Robot::Robot(Ogre::SceneManager* SceneManager, std::string name, std::string fil
 }
 
 void Robot::update(Ogre::Real deltaTime){
+	if (health < 30){
+		state = HURT;
+	}
 	
 	this->updateAnimations(deltaTime);	// Update animation playback
 	if (!flying && !dead){
 										  	// Update animation playback
 		this->updateLocomote(deltaTime);	// Update Locomotion
+
+		if (atLocation && robAnim != SHOOT){
+			this->setAnimation(SHOOT);
+		}
 	}
 
 	//Knockback code (similar to fish 'shoot' method)
 	else if (!dead){
 		using namespace Ogre;
-
-		Vector3 pos = this->mBodyNode->getPosition();
+		Vector3 pos = mBodyNode->getPosition();
 		vel = vel + (gravity * deltaTime);
 		pos = pos + (vel * deltaTime); // velocity
 		pos = pos + 0.5 * gravity * deltaTime * deltaTime; // acceleration
@@ -63,7 +70,7 @@ void Robot::update(Ogre::Real deltaTime){
 		this->mBodyNode->setPosition(pos);
 
 		if (this->mBodyNode->getPosition().y <= 0){
-			mBodyNode->setPosition(mBodyNode->getPosition().x, 0, mBodyNode->getPosition().z);
+			mBodyNode->setPosition(getPosition().x, 0, getPosition().z);
 			flying = false;
 			if (health <= 0) setDeath();
 		}
@@ -72,16 +79,25 @@ void Robot::update(Ogre::Real deltaTime){
 
 void Robot::updateLocomote(Ogre::Real deltaTime){
 	Ogre::Vector3 yoshPos = app->getYoshimiPointer()->getPosition();
-	if (mBodyNode->getPosition().distance(yoshPos) < 20){
-		//std::cout << "FLEEING:: " << std::endl;
+	if (state == NORMAL){
+		mDirection = flockingNormal();
+	}
+	else if (state == HURT){
+		Ogre::Real dist = mBodyNode->getPosition().distance(yoshPos);
+		if (dist < 20){
+			fleeSet = true;
 			mDirection = flockingFlee();
-			atLocation = true;
-		//}
+		}
+		else if (dist > 30){
+			fleeSet = false;
+			mDirection = flockingNormal();
+		}
+	}
+	else if (state == ANGRY){
+		mDirection = flockingSeek();
 	}
 	else{
-		fleeSet = false;
-		atLocation = false;
-		mDirection = flockingNormal();//get the flocking velocity
+		mDirection = Ogre::Vector3::ZERO;
 	}
 	if (mDirection != Ogre::Vector3::ZERO){//if the velocity isnt zero set up animations
 		if (robAnim != WALK){
@@ -293,7 +309,7 @@ Ogre::Vector3 Robot::flockingNormal(){				//need to add stuff to gameapplication
 	for (aIter = agents.begin(); aIter != agents.end(); aIter++){
 		//to not pick itself
 		//Also: dont use robots who are in the air, it screws everything up!
-		if (this != (*aIter) && (*aIter)->notFlying() && (*aIter)->notDead() && (*aIter)->notAtLocation()){
+		if (this != (*aIter) && (*aIter)->notFlying() && (*aIter)->notDead() && (*aIter)->notAtLocation() && (*aIter)->notFleeing()){
 			//calc the weight....maybe later
 			weight = 1;
 			temp2 = (*aIter)->getPosition();
@@ -393,11 +409,10 @@ void Robot::getHit(char attack, Ogre::Vector3 dir){
 
 //Similar to 'fire' method in fish game.  We will knock this robot back
 void Robot::setFlyback(int velocity,Ogre::Vector3 dir){
-
 	flying = true;
-
+	atLocation = false;
 	// set up the initial state
-	initPos = this->mBodyNode->getPosition();
+	initPos = mBodyNode->getPosition();
 	vel.x = -dir[0] * velocity;									
 	vel.y = 0.707 * velocity;				//y and z values are determined by the angle of trajectory multiplied by velocity
 	vel.z = -dir[2] * velocity;
@@ -410,6 +425,13 @@ void Robot::setFlyback(int velocity,Ogre::Vector3 dir){
 
 //this probably didnt need to be its own method
 void Robot::setDeath(){
+	std::list<Robot*> robots = app->getRobotList();
+	for (Robot* guy : robots){
+		if (getPosition().distance(guy->getPosition()) < 20){
+			guy->setAngry();
+		}
+	}
+	atLocation = false;
 	setAnimation(DIE);
 	dead = true;
 

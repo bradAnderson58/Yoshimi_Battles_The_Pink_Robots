@@ -8,7 +8,6 @@ class GameApplication;
 class Robot : public Agent{
 
 public:
-
 	int counter;
 	int testing;
 	
@@ -29,9 +28,18 @@ public:
 	bool notFlying() { return !flying; }  //returns true if flying is false -dp exclusive
 	bool notDead() { return !dead; }     //or dead
 	bool notAtLocation(){return !atLocation;}
+	bool notFleeing(){return !fleeSet;}
+	void setFriendDied(){closeFriendDied = true;}
+	void setAngry(){state = ANGRY;}
 
 private:
-
+	enum State{
+		NORMAL,
+		HURT,
+		ANGRY,
+		BOSS,
+		FOLLOWER
+	};
 	enum AnimID
 	{
 		DIE,
@@ -40,14 +48,6 @@ private:
 		SLUMP,
 		WALK,
 		ANIM_NONE
-	};
-
-	enum State{
-		NORMAL,
-		HURT,
-		ANGRY,
-		BOSS,
-		FOLLOWER
 	};
 
 	State state;
@@ -71,6 +71,7 @@ private:
 	bool atLocation;
 	bool goRight;
 	bool fleeSet;
+	bool closeFriendDied;
 };
 
 #endif
