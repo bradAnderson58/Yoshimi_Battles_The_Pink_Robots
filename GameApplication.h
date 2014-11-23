@@ -25,14 +25,15 @@ private:
 
 	//Boundaries of the world
 	Grid *grid;
-	float gridX;
-	float gridY;
-	void setWorldSpace();
+	float xMax, zMax;
 
 public:	
 
     GameApplication(void);
     virtual ~GameApplication(void); 
+
+	float getXmax() { return xMax; }
+	float getZmax() { return zMax; }
 
 	void loadEnv();			// Load the buildings or ground plane, etc.
 	void setupEnv();		// Set up the lights, shadows, etc

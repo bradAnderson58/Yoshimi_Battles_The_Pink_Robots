@@ -65,6 +65,8 @@ private:
 	Ogre::Vector3 flockingSeek();
 	Ogre::Vector3 flockingLeader();
 
+	void checkBoundaryCollision();  //Checking for boundary coolisions
+
 	bool flying;		//if the robot is in the process of being knocked back
 	int health;			//this is robot health
 	bool dead;			//dead robot

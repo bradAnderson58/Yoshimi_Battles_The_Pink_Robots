@@ -42,6 +42,7 @@ Robot::Robot(Ogre::SceneManager* SceneManager, std::string name, std::string fil
 	else{
 		goRight = false;
 	}
+
 }
 
 void Robot::update(Ogre::Real deltaTime){
@@ -75,6 +76,7 @@ void Robot::update(Ogre::Real deltaTime){
 			if (health <= 0) setDeath();
 		}
 	}
+	checkBoundaryCollision();
 }
 
 void Robot::updateLocomote(Ogre::Real deltaTime){
@@ -434,5 +436,25 @@ void Robot::setDeath(){
 	atLocation = false;
 	setAnimation(DIE);
 	dead = true;
+
+}
+
+//check if I'm going outside of the boundaries
+void Robot::checkBoundaryCollision(){
+	
+	float xBound = app->getXmax() + 5;
+	float zBound = app->getZmax() + 5;
+
+	if (mBodyNode->getPosition().x <= -xBound || mBodyNode->getPosition().x >= xBound){
+		//hit bounds in x direction
+		mDirection.x = -mDirection.x;
+		std::cout << "I hit the wall!" << std::endl;
+
+	}
+	if (mBodyNode->getPosition().z <= -zBound || mBodyNode->getPosition().z >= zBound){
+		//hit bounds in z direction
+		mDirection.z = -mDirection.z;
+		std::cout << "I hit z wall " << std::endl;
+	}
 
 }
