@@ -298,22 +298,27 @@ GameApplication::setupEnv()
 void
 GameApplication::addTime(Ogre::Real deltaTime)
 {
+	int dead = 0;  //see how many robots are dead
+	std::string comment = "Safe";
 	// Iterate over the list of agents (robots)
 	std::list<Robot*>::iterator iter;
-	for (iter = RobotList.begin(); iter != RobotList.end(); iter++)
+	for (iter = RobotList.begin(); iter != RobotList.end(); iter++){
 		if (*iter != NULL){
 			(*iter)->update(deltaTime);
 			if (!(*iter)->notAtLocation() && !gameOver){
 				houseHealth -= .001;
 				houseHUD->setProgress(houseHUD->getProgress() - .001);
-				houseHUD->setComment("Under Attack!");
+				comment = "Under Attack!";
 			}
-			else if (!gameOver) houseHUD->setComment("Safe");
 		}
+		if (!(*iter)->notDead()) dead++;
+	}
+	if (!gameOver) houseHUD->setComment(comment);  //warn if house is under attack
 
 	if (startGame) yoshPointer->update(deltaTime); //Yoshimi has a different update function
 	
 	if (houseHealth <= 0 && !gameOver) endGame('l');
+	if (dead != 0 && dead == RobotList.size() && !gameOver) endGame('w'); 
 
 }
 
@@ -600,5 +605,8 @@ void GameApplication::endGame(char condition){
 	if (condition == 'l'){
 		mTrayMgr->destroyAllWidgetsInTray(OgreBites::TL_TOP);
 		mTrayMgr->createLabel(OgreBites::TL_CENTER, "end", "YOU'RE A LOSE!!", 300.0f);
+	}else if (condition == 'w'){
+		mTrayMgr->destroyAllWidgetsInTray(OgreBites::TL_TOP);
+		mTrayMgr->createLabel(OgreBites::TL_CENTER, "end2", "YOU ARE WINNER!!", 300.0f);
 	}
 }
