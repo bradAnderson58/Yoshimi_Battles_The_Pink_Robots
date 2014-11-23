@@ -72,7 +72,10 @@ public:
 	//this node has a barrel on it
 	GridNode* loadObject(std::string name, std::string filename, int row, int height, int col, float scale = 1); // load and place a model in a certain location.
 	
-	Ogre::Vector3 getPosition(int r, int c);	// return the position  
+	Ogre::Vector3 getPosition(int r, int c);	// return the position
+
+	int getRows() { return nRows; }   //needed for world bounds
+	int getCols() { return nCols; }
 };
 
 #endif

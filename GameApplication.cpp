@@ -251,8 +251,9 @@ GameApplication::loadEnv()
 	inputfile.close();
 	grid->printToFile(); // see what the initial grid looks like.
 
-	//boundBox = temp->entity->getWorldBoundingBox(true);  //boundBox is the bounding box for the barrel
-	setWorldSpace();
+	//set up world boundaries
+	xMax = (grid->getRows() - 1) / 2;
+	zMax = (grid->getCols() - 1) / 2;
 }
 
 void // Set up lights, shadows, etc
@@ -295,7 +296,7 @@ GameApplication::addTime(Ogre::Real deltaTime)
 				houseHUD->setProgress(houseHUD->getProgress() - .001);
 				houseHUD->setComment("Under Attack!");
 			}
-			else houseHUD->setComment("Safe");
+			else if (!gameOver) houseHUD->setComment("Safe");
 		}
 
 	if (startGame) yoshPointer->update(deltaTime); //Yoshimi has a different update function
@@ -588,8 +589,4 @@ void GameApplication::endGame(char condition){
 		mTrayMgr->destroyAllWidgetsInTray(OgreBites::TL_TOP);
 		mTrayMgr->createLabel(OgreBites::TL_CENTER, "end", "YOU'RE A LOSE!!", 300.0f);
 	}
-}
-
-void GameApplication::setWorldSpace(){
-	
 }
