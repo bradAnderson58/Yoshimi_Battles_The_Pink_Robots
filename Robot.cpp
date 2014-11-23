@@ -62,10 +62,11 @@ void Robot::update(Ogre::Real deltaTime){
 
 	//Knockback code (similar to fish 'shoot' method)
 	else if (!dead){
+		checkBoundaryCollision();
 		using namespace Ogre;
 		Vector3 pos = mBodyNode->getPosition();
-		vel = vel + (gravity * deltaTime);
-		pos = pos + (vel * deltaTime); // velocity
+		mDirection = mDirection + (gravity * deltaTime);
+		pos = pos + (mDirection * deltaTime); // velocity
 		pos = pos + 0.5 * gravity * deltaTime * deltaTime; // acceleration
 
 		this->mBodyNode->setPosition(pos);
@@ -76,7 +77,6 @@ void Robot::update(Ogre::Real deltaTime){
 			if (health <= 0) setDeath();
 		}
 	}
-	checkBoundaryCollision();
 }
 
 void Robot::updateLocomote(Ogre::Real deltaTime){
@@ -106,6 +106,10 @@ void Robot::updateLocomote(Ogre::Real deltaTime){
 			setAnimation(WALK);
 		}
 		mTimer = 0;
+
+		//check wall issues
+		checkBoundaryCollision();     
+
 		//always rotating
 		Ogre::Vector3 src = mBodyNode->getOrientation() * Ogre::Vector3::UNIT_X;//rotate for first location
 		if ((1.0f + src.dotProduct(mDirection)) < 0.0001f) 
@@ -117,6 +121,7 @@ void Robot::updateLocomote(Ogre::Real deltaTime){
 			Ogre::Quaternion quat = src.getRotationTo(mDirection.normalisedCopy());
 			mBodyNode->rotate(quat);
 		}
+		
 		mBodyNode->translate(mDirection);
 	}
 	else{//when velocity is zero set idle animations
@@ -415,9 +420,9 @@ void Robot::setFlyback(int velocity,Ogre::Vector3 dir){
 	atLocation = false;
 	// set up the initial state
 	initPos = mBodyNode->getPosition();
-	vel.x = -dir[0] * velocity;									
-	vel.y = 0.707 * velocity;				//y and z values are determined by the angle of trajectory multiplied by velocity
-	vel.z = -dir[2] * velocity;
+	mDirection.x = -dir[0] * velocity;									
+	mDirection.y = 0.707 * velocity;				//y and z values are determined by the angle of trajectory multiplied by velocity
+	mDirection.z = -dir[2] * velocity;
 
 	//gravity
 	gravity.x = 0;
@@ -442,19 +447,20 @@ void Robot::setDeath(){
 //check if I'm going outside of the boundaries
 void Robot::checkBoundaryCollision(){
 	
-	float xBound = app->getXmax() + 5;
-	float zBound = app->getZmax() + 5;
+	float xBound = (app->getXmax() * 10) - 5;
+	float zBound = (app->getZmax() * 10) - 5;
 
 	if (mBodyNode->getPosition().x <= -xBound || mBodyNode->getPosition().x >= xBound){
 		//hit bounds in x direction
+		
 		mDirection.x = -mDirection.x;
-		std::cout << "I hit the wall!" << std::endl;
+		
 
 	}
 	if (mBodyNode->getPosition().z <= -zBound || mBodyNode->getPosition().z >= zBound){
 		//hit bounds in z direction
 		mDirection.z = -mDirection.z;
-		std::cout << "I hit z wall " << std::endl;
+		
 	}
 
 }
