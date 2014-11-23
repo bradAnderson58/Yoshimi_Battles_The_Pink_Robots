@@ -261,7 +261,7 @@ GameApplication::loadEnv()
 	objs.clear(); // calls their destructors if there are any. (not good enough)
 	
 	inputfile.close();
-	grid->printToFile(); // see what the initial grid looks like.
+	//grid->printToFile(); // see what the initial grid looks like.
 
 	//set up world boundaries
 	xMax = (grid->getRows() - 1) / 2;
