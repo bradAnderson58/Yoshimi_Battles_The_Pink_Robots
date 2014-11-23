@@ -103,6 +103,31 @@ void Yoshimi::updateLocomote(Ogre::Real deltaTime){
 	else if(newPos[2] < -maxZ + .5){
 		newPos[2] = -maxZ + .5;
 	}
+
+	Ogre::Vector3 hp = app->getHousePointer()->getPosition();
+	hp[1] = 0;
+	if (newPos.distance(hp) < 25){
+		float xvals = newPos[0] - hp[0];
+		float zvals = newPos[2] - hp[2];
+		if ((xvals < 15 && xvals > -18) && (zvals < 18 && zvals > -15)){
+			if (abs(xvals) > abs(zvals)){
+				if(xvals > 0){
+					newPos[0] = hp[0] + 15;
+				}
+				else{
+					newPos[0] = hp[0] - 18;
+				}
+			}
+			else{
+				if (zvals > 0){
+					newPos[2] = hp[2] + 18;
+				}
+				else{
+					newPos[2] = hp[2] - 15;
+				}
+			}
+		}
+	}
 	mBodyNode->setPosition(newPos);
 }
 
