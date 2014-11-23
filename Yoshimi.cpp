@@ -54,6 +54,8 @@ Yoshimi::Yoshimi(Ogre::SceneManager* SceneManager, std::string name, std::string
 void Yoshimi::update(Ogre::Real deltaTime){
 	this->updateAnimations(deltaTime);	// Update animation playback
 	this->updateLocomote(deltaTime);	// Update Locomotion
+	this->collisionRobots();
+
 }
 
 void Yoshimi::updateLocomote(Ogre::Real deltaTime){
@@ -221,4 +223,22 @@ void Yoshimi::checkHits(char attack){
 		}
 	}
 
+}
+
+void Yoshimi::collisionRobots(){
+	std::list<Robot*> robots = app->getRobotList();
+
+	Ogre::Vector3 temp(0,0,0);
+	Ogre::Vector3 pos = mBodyNode->getPosition();
+	Ogre::Vector3 rPos;
+	for(Robot* r : robots){
+		rPos = r->getPosition();
+		if (pos.distance(rPos) < 2){
+			temp = pos - rPos;
+			temp.normalise();
+			temp = rPos + (temp * 3);
+			temp[1] = 0;
+			setPosition(temp[0], 0, temp[2]);
+		}
+	}
 }
