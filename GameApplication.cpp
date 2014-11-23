@@ -12,6 +12,8 @@ GameApplication::GameApplication(void):
 	agent = NULL; // Init member data
 	housePointer = NULL;
 	startGame = false;
+	houseHealth = 1.0f;
+	gameOver = false;
 	
 	//set up these strings for later usages
 	std::stringstream ins;	// a stream for outputing to a string (why no clear()?)
@@ -28,6 +30,10 @@ GameApplication::GameApplication(void):
 	cre << "\nLEAD DEVELOPERS:  Brad Anderson and Kevin Dec, \nDangling Pointers LLC";
 	credits = cre.str();
 
+	music = __FILE__; //gets the current cpp file's path with the cpp file
+	music = music.substr(0,1+music.find_last_of('\\')); //removes filename to leave path
+	music+= "\\Sounds\\YBPR_part2.wav"; //if txt file is in the same directory as cpp file
+
 }
 //-------------------------------------------------------------------------------------
 GameApplication::~GameApplication(void)
@@ -39,7 +45,6 @@ GameApplication::~GameApplication(void)
 //-------------------------------------------------------------------------------------
 void GameApplication::createScene(void)
 {
-	message();
     /*loadEnv();
 	setupEnv();*/  //DO THIS ELSEWHERE?
 	//loadObjects();
@@ -80,6 +85,9 @@ GameApplication::loadEnv()
 		float orient;
 		bool agent;
 	};
+
+	PlaySound(music.c_str(), NULL, SND_FILENAME|SND_ASYNC);
+
 	GridNode *temp;  //FOR TESTING REMOVE
 
 	ifstream inputfile;		// Holds a pointer into the file
@@ -277,11 +285,18 @@ GameApplication::addTime(Ogre::Real deltaTime)
 	// Iterate over the list of agents (robots)
 	std::list<Robot*>::iterator iter;
 	for (iter = RobotList.begin(); iter != RobotList.end(); iter++)
-		if (*iter != NULL)
+		if (*iter != NULL){
 			(*iter)->update(deltaTime);
+			if (!(*iter)->notAtLocation() && !gameOver){
+				houseHealth -= .001;
+				houseHUD->setProgress(houseHUD->getProgress() - .001);
+			}
+		}
 
 	if (startGame) yoshPointer->update(deltaTime); //Yoshimi has a different update function
 	
+	if (houseHealth <= 0 && !gameOver) endGame('l');
+
 }
 
 bool 
@@ -473,45 +488,33 @@ void GameApplication::createGUI(void)
 	//////////////////////////////////////////////////////////////////////////////////
 	
 	if (mTrayMgr == NULL) return;
-	using namespace OgreBites;
-
-	std::string label = "Trajectory"; 
+	using namespace OgreBites; 
 	
-	/*The slider will be used to get the value of the trajectory and the velocity
-	OgreBites::Slider *mS = mTrayMgr->createThickSlider(TL_TOP, "SampleSlider", label, 250, 80, 0, 0, 0);
-	mS->setRange(0, 100, 101); //so the third parmeter for this method was not what i was expecting: much confuse
-	mS->setValue(50);
-	mTrayMgr->sliderMoved(mS);*/
+	//Set up our GUI buttons------------------------------------------------
+
 	OgreBites::Label *title = mTrayMgr->createLabel(TL_CENTER, "Title", "Yoshimi Battles The Pink Robots", 500.0f);
 	mTrayMgr->createSeparator(TL_CENTER,"sep", 500.0f);
 	
 	cont = mTrayMgr->createButton(TL_CENTER, "ClickMe", "Play", 200.0);
 	mTrayMgr->buttonHit(cont);
-	//cont->show();
 
 	inst = mTrayMgr->createButton(TL_CENTER, "instruct", "Instructions", 200.0);
 	mTrayMgr->buttonHit(inst);
-	//inst->show();
 
 	cred = mTrayMgr->createButton(TL_CENTER, "credit", "Credits", 200.0);
 	mTrayMgr->buttonHit(cred);
 
-	texty = mTrayMgr->createTextBox(TL_CENTER, "text", "", 300.0, 200.0);
-	//texty->setText("Some test Text");
+	texty = mTrayMgr->createTextBox(TL_CENTER, "text", "", 350.0, 200.0);
 	texty->hide();
 
 	back = mTrayMgr->createButton(TL_CENTER, "back", "Back", 200.0);
 	mTrayMgr->buttonHit(back);
 	back->hide();
 
-	//use the paramsPanel to display number of successful shots
-	Ogre::StringVector items;
-	items.push_back("Yoshimi");
-	mParamsPanel = mTrayMgr->createParamsPanel(OgreBites::TL_TOPRIGHT,"Testing",250,items);
-	mParamsPanel->setParamValue(0, Ogre::StringConverter::toString(0));
-
-	//mTrayMgr->showAll();
-	
+	//House HUD will not display until game starts - decrement health when robots attack
+	houseHUD = mTrayMgr->createProgressBar(TL_TOP, "househealth", "HOUSE", 350.0f, 0.0f);
+	houseHUD->setProgress(1);
+	houseHUD->hide();
 
 	//////////////////////////////////////////////////////////////////////////////////
 }
@@ -523,10 +526,12 @@ void GameApplication::buttonHit(OgreBites::Button* b)
 	{
 		//Delete start GUI and start game
 		if (!startGame){
+			PlaySound(NULL, NULL, NULL);
 			mTrayMgr->destroyAllWidgetsInTray(OgreBites::TL_CENTER); //going to remove
 			loadEnv();
 			setupEnv();
 			startGame = true;
+			houseHUD->show();
 		}
 	}
 	else if (b->getName() == "instruct")
@@ -569,9 +574,12 @@ void GameApplication::buttonHit(OgreBites::Button* b)
 }
 
 
-void GameApplication::message(){
+void GameApplication::endGame(char condition){
 
-	//while (!startGame){
-
-	//}
+	PlaySound(NULL, NULL, NULL);
+	gameOver = true;
+	if (condition == 'l'){
+		mTrayMgr->destroyAllWidgetsInTray(OgreBites::TL_TOP);
+		mTrayMgr->createLabel(OgreBites::TL_CENTER, "end", "YOU'RE A LOSE!!", 300.0f);
+	}
 }

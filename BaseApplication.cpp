@@ -271,6 +271,10 @@ bool BaseApplication::setup(void)
     // Load resources
 	//mTrayMgr should be initialized in the Frame Listener
 	createFrameListener();
+	std::string path = __FILE__; //gets the current cpp file's path with the cpp file
+	path = path.substr(0,1+path.find_last_of('\\')); //removes filename to leave path
+	path+= "\\Sounds\\YBPR_part1.wav"; //if txt file is in the same directory as cpp file
+	PlaySound(path.c_str(), NULL, SND_FILENAME|SND_ASYNC);    //Intro song plays immediately
 	
 	//loader bar for loading
 	mTrayMgr->showLoadingBar(1, 0); 

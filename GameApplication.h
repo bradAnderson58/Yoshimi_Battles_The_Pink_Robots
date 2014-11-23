@@ -11,10 +11,13 @@ class GameApplication : public BaseApplication
 {
 private:
 	Agent* agent; // store a pointer to the character
-	std::list<Robot*> RobotList; // Lecture 5: now a list of agents
+	std::list<Robot*> RobotList; //now a list of robots
 
 	Yoshimi* yoshPointer;	//This is our heroic savior, Yoshimi!
-	Ogre::SceneNode* housePointer;
+	Ogre::SceneNode* housePointer;		//point to the location of the house COM
+	float houseHealth;					//when health gets to zero, much sad
+	bool gameOver;
+
 	std::list<Ogre::SceneNode*> wallList;
 	Ogre::AxisAlignedBox boundBox;  //bounding box of the barrel
 
@@ -57,6 +60,7 @@ public:
 	std::list<Robot*> getRobotList(){return RobotList;}
 	Ogre::SceneNode* getHousePointer(){return housePointer;}
 
+	void endGame(char condition);		//End the game in either victory or crushing defeat
 
 protected:
     virtual void createScene(void);
@@ -65,20 +69,23 @@ protected:
 
 	void buttonHit(OgreBites::Button *b);
 
-	void message();  //test this out real quick
 	bool startGame;	//start button
 
-	//GUI buttons
+	//GUI buttons and such
 	OgreBites::Button *cont;
 	OgreBites::Button *inst;
 	OgreBites::Button *cred;
 	OgreBites::TextBox *texty;
 	OgreBites::Button *back;
+	OgreBites::ProgressBar *houseHUD;
 
 	//Strings for GUI
 	std::string instruction;
 	std::string credits;
 	
+	//Path files for sounds
+	std::string music;
+
 	OgreBites::ParamsPanel* mParamsPanel;
 
 };
