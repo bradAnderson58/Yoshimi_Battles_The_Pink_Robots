@@ -272,20 +272,14 @@ bool BaseApplication::setup(void)
 	//mTrayMgr should be initialized in the Frame Listener
 	createFrameListener();
 	
-	//mTrayMgr = new OgreBites::SdkTrayManager("InterfaceName", mWindow, mInputContext, this);
-	mTrayMgr->showLoadingBar(); 
+	//loader bar for loading
+	mTrayMgr->showLoadingBar(1, 0); 
 	loadResources();
 	mTrayMgr->hideLoadingBar();
 
+	createGUI();  //my guis  - make these before creating scene?
+	// Create the scene
 	createScene();
-    //loadResources();
-
-    // Create the scene
-    //createScene();
-
-    //createFrameListener();
-
-	createGUI();  //my guis
 
     return true;
 };
