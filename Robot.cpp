@@ -206,7 +206,6 @@ Ogre::Vector3 Robot::getSpecificPos(){
 
 	for (rIter = robots.begin(); rIter != robots.end(); rIter++){
 		if ( !(*rIter)->notAtLocation()){
-			//std::cout << "atLocation" << std::endl;
 			occupied.push_back((*rIter)->getPosition());
 		}
 	}
@@ -231,16 +230,16 @@ Ogre::Vector3 Robot::getSpecificPos(){
 		for (Ogre::Vector3 thing : occupied){
 			temp = thing - ret;
 			dist = temp.length();
-			if (dist < 5){
+			if (dist < 2.5){
 				tooClose = true;
 			}
 		}
 		if (tooClose){
 			if(goRight){
-				angle = -.05;
+				angle = -.1;
 			}
 			else{
-				angle += .05;
+				angle += .1;
 			}
 			c = cos(angle);
 			s = sin(angle);
@@ -251,7 +250,6 @@ Ogre::Vector3 Robot::getSpecificPos(){
 			tooClose = false;
 		}
 		else{
-			std::cout << "ANGLE: " << angle << std::endl;
 			endLoop = false;
 		}
 	}while (endLoop);	
@@ -325,10 +323,13 @@ Ogre::Vector3 Robot::flockingNormal(){				//need to add stuff to gameapplication
 		return Ogre::Vector3::ZERO;
 	}
 	else if (distance < 100){
+		atLocation = false;
 		omgwork = getSpecificPos();
 		omgwork = omgwork - mBodyNode->getPosition();
 		omgwork.normalise();
-		return omgwork;
+		if (distance < 60){
+			return omgwork * .05;
+		}
 	}
 	else{
 		atLocation = false;
@@ -337,7 +338,7 @@ Ogre::Vector3 Robot::flockingNormal(){				//need to add stuff to gameapplication
 	omgwork[1] = 0;
 
 	//the constants and parts of the velocity put together.
-	vel = .01 * alignment + 2.5 * seperation + .01 * cohesion +  .05 * omgwork;
+	vel = .01 * alignment + 1.5 * seperation + .05 * cohesion +  .05 * omgwork;
 
 	return vel;
 }
