@@ -85,7 +85,25 @@ void Yoshimi::updateLocomote(Ogre::Real deltaTime){
 			if (yoshAnim != STEALTH) setAnimation(STEALTH);
 		}
 	}
-	mBodyNode->translate(translator);
+
+	float maxX = app->getXmax() * 10 -5;
+	float maxZ = app->getZmax() * 10 -5;
+
+	Ogre::Vector3 newPos = translator + getPosition();
+
+	if (newPos[0] > maxX -.5){
+		newPos[0] = maxX -.5;
+	}
+	else if (newPos[0] < -maxX + .5){
+		newPos[0] = -maxX + .5;
+	}
+	if (newPos[2] > maxZ - .5){
+		newPos[2] = maxZ - .5;
+	}
+	else if(newPos[2] < -maxZ + .5){
+		newPos[2] = -maxZ + .5;
+	}
+	mBodyNode->setPosition(newPos);
 }
 
 //Set movement flags based on a char to represent direction and boolean on or not
@@ -236,7 +254,7 @@ void Yoshimi::collisionRobots(){
 		if (pos.distance(rPos) < 2){
 			temp = pos - rPos;
 			temp.normalise();
-			temp = rPos + (temp * 3);
+			temp = rPos + (temp * 2);
 			temp[1] = 0;
 			setPosition(temp[0], 0, temp[2]);
 		}
@@ -244,20 +262,5 @@ void Yoshimi::collisionRobots(){
 }
 
 void Yoshimi::collisionWalls(){
-	float maxX = app->getXmax() * 10 -5;
-	float maxZ = app->getZmax() * 10 -5;
-
-	if (getPosition()[0] >= maxX && mDirection[0] > 0){
-		mDirection[0] = 0;
-	}
-	if (getPosition()[0] <= -maxX && mDirection[0] < 0){
-		mDirection[0] = 0;
-	}
-
-	if (getPosition()[2] >= maxZ && mDirection[2] > 0){
-		mDirection[2] = 0;
-	}
-	if (getPosition()[2] <= -maxZ && mDirection[2] < 0){
-		mDirection[2] = 0;
-	}
+	
 }

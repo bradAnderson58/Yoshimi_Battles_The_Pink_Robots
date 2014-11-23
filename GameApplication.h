@@ -21,6 +21,7 @@ private:
 	bool gameOver;
 
 	std::list<Ogre::SceneNode*> wallList;
+	std::list<Ogre::SceneNode*> borderWalls;
 	Ogre::AxisAlignedBox boundBox;  //bounding box of the barrel
 
 	//Boundaries of the world
