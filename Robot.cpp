@@ -451,23 +451,47 @@ void Robot::checkBoundaryCollision(){
 	
 	float xBound = (app->getXmax() * 10) - 5;
 	float zBound = (app->getZmax() * 10) - 5;
+	Ogre::Vector3 myPos = mBodyNode->getPosition();
+	Ogre::Vector3 house = app->getHousePointer()->getPosition();
+	house.y = 0;  //to prevent crazies
 
-	if (mBodyNode->getPosition().x <= -xBound){
+	if (myPos.x <= -xBound){
 		//hit bounds in x direction
-		mBodyNode->setPosition(-xBound, mBodyNode->getPosition().y, mBodyNode->getPosition().z);
+		mBodyNode->setPosition(-xBound, myPos.y, myPos.z);
 		mDirection.x = -mDirection.x;
-	}else if ( mBodyNode->getPosition().x >= xBound){
-		mBodyNode->setPosition(xBound, mBodyNode->getPosition().y, mBodyNode->getPosition().z);
+	}else if ( myPos.x >= xBound){
+
+		mBodyNode->setPosition(xBound, myPos.y, myPos.z);
 		mDirection.x = -mDirection.x;
 	}
-	if (mBodyNode->getPosition().z <= -zBound){
+	if (myPos.z <= -zBound){
 		//hit bounds in z direction
-		mBodyNode->setPosition( mBodyNode->getPosition().x, mBodyNode->getPosition().y, -zBound);
+		mBodyNode->setPosition( myPos.x, myPos.y, -zBound);
 		mDirection.z = -mDirection.z;
 		
-	}else if (mBodyNode->getPosition().z >= zBound){
+	}else if (myPos.z >= zBound){
 		
-		mBodyNode->setPosition( mBodyNode->getPosition().x, mBodyNode->getPosition().y, zBound);
+		mBodyNode->setPosition( myPos.x, myPos.y, zBound);
 		mDirection.z = -mDirection.z;
 	}
+
+	//Do house checking as well
+	//First check if in location, then do more maths
+	float dist = myPos.distance(house);
+	float xDist = myPos.x - house.x;
+	float zDist = myPos.z - house.z;
+
+	if (dist < 22){
+		if (xDist <= 15.0 && zDist <= 18.0){  //robot hits the house
+			if (xDist < zDist){
+				mBodyNode->setPosition(myPos.x, myPos.y, house.z + 18.0);
+				mDirection.z = -mDirection.z;
+			}else{
+				mBodyNode->setPosition(house.x + 15.0, myPos.y, myPos.z);
+				mDirection.x = -mDirection.x;
+			}
+		}
+	}
+
+
 }
