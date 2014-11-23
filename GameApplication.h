@@ -7,6 +7,8 @@
 #include "Robot.h"
 #include "Grid.h"
 
+class Grid;  //okay whatever
+
 class GameApplication : public BaseApplication
 {
 private:
@@ -21,15 +23,23 @@ private:
 	std::list<Ogre::SceneNode*> wallList;
 	Ogre::AxisAlignedBox boundBox;  //bounding box of the barrel
 
+	//Boundaries of the world
+	Grid *grid;
+	float gridX;
+	float gridY;
+	void setWorldSpace();
+
 public:	
 
     GameApplication(void);
-    virtual ~GameApplication(void);
+    virtual ~GameApplication(void); 
 
 	void loadEnv();			// Load the buildings or ground plane, etc.
 	void setupEnv();		// Set up the lights, shadows, etc
 	void loadObjects();		// Load other props or objects (e.g. furniture)
 	void loadCharacters();	// Load actors, agents, characters
+
+	Grid* getGrid(){ return grid; } //get it
 
 	void addTime(Ogre::Real deltaTime);		// update the game state
 

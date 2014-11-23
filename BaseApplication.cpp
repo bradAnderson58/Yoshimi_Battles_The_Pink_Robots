@@ -298,9 +298,9 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
 
 	//Fix for 1.9
 	//Need to capture/update each device
-    /*mKeyboard->capture();
-    mMouse->capture();*/
-	mInputContext.capture();
+    mKeyboard->capture();
+    mMouse->capture();
+	//mInputContext.capture();
 
     mTrayMgr->frameRenderingQueued(evt);
 	this->addTime(evt.timeSinceLastFrame);

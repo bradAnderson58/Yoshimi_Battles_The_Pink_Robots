@@ -86,8 +86,11 @@ GameApplication::loadEnv()
 		bool agent;
 	};
 
-	PlaySound(music.c_str(), NULL, SND_FILENAME|SND_ASYNC);
-
+	PlaySound(music.c_str(), NULL, SND_FILENAME|SND_ASYNC);  //Game sound
+	//mInputManager->destroyInputObject(mMouse);
+	//mMouse = NULL;								//How to hide the mouse?
+	//mMouse->getMouseState();
+	
 	GridNode *temp;  //FOR TESTING REMOVE
 
 	ifstream inputfile;		// Holds a pointer into the file
@@ -120,7 +123,7 @@ GameApplication::loadEnv()
 	floor->setCastShadows(false);
 	mSceneMgr->getRootSceneNode()->attachObject(floor);
 
-	Grid grid(mSceneMgr, z, x); // Set up the grid. z is rows, x is columns
+	grid = new Grid(mSceneMgr, z, x); // Set up the grid. z is rows, x is columns
 	
 	string buf;
 	inputfile >> buf;	// Start looking for the Objects section
@@ -179,10 +182,10 @@ GameApplication::loadEnv()
 					if (c == 'n') {
 						agent = new Yoshimi(this->mSceneMgr, getNewName(), rent->filename, rent->y, rent->scale, this);
 						yoshPointer = (Yoshimi*) agent;  //you are a yoshimi
-						agent->setPosition(grid.getPosition(i,j).x, 0, grid.getPosition(i,j).z);
+						agent->setPosition(grid->getPosition(i,j).x, 0, grid->getPosition(i,j).z);
 					}else {
 						Robot* robot = new Robot(this->mSceneMgr, getNewName(), rent->filename, rent->y, rent->scale, this);
-						robot->setPosition(grid.getPosition(i,j).x, 0, grid.getPosition(i,j).z);
+						robot->setPosition(grid->getPosition(i,j).x, 0, grid->getPosition(i,j).z);
 						RobotList.push_back(robot);
 					}
 					//agent->setApp(this);  //in constructor
@@ -192,11 +195,11 @@ GameApplication::loadEnv()
 				{
 					if (rent->filename == "tudorhouse.mesh"){
 						String work = getNewName();
-						temp = grid.loadObject(work, rent->filename, i, rent->y, j, rent->scale);
+						temp = grid->loadObject(work, rent->filename, i, rent->y, j, rent->scale);
 						housePointer = mSceneMgr->getSceneNode(work);
 					}
 					//The temp object holds a pointer to the barrel node, which we need for bounding box access
-					temp = grid.loadObject(getNewName(), rent->filename, i, rent->y, j, rent->scale);
+					temp = grid->loadObject(getNewName(), rent->filename, i, rent->y, j, rent->scale);
 					
 				}
 			else // not an object or agent
@@ -208,8 +211,8 @@ GameApplication::loadEnv()
 					Ogre::SceneNode* mNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
 					mNode->attachObject(ent);
 					mNode->scale(0.1f,0.2f,0.1f); // cube is 100 x 100
-					grid.getNode(i,j)->setOccupied();  // indicate that agents can't pass through
-					mNode->setPosition(grid.getPosition(i,j).x, 10.0f, grid.getPosition(i,j).z);
+					grid->getNode(i,j)->setOccupied();  // indicate that agents can't pass through
+					mNode->setPosition(grid->getPosition(i,j).x, 10.0f, grid->getPosition(i,j).z);
 					wallList.push_back(mNode);
 				}
 				else if (c == 'i') // create a invisible wall
@@ -219,8 +222,8 @@ GameApplication::loadEnv()
 					Ogre::SceneNode* mNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
 					mNode->attachObject(ent);
 					mNode->scale(0.1f,0.2f,0.1f); // cube is 100 x 100
-					grid.getNode(i,j)->setOccupied();  // indicate that agents can't pass through
-					mNode->setPosition(grid.getPosition(i,j).x, 10.0f, grid.getPosition(i,j).z);
+					grid->getNode(i,j)->setOccupied();  // indicate that agents can't pass through
+					mNode->setPosition(grid->getPosition(i,j).x, 10.0f, grid->getPosition(i,j).z);
 					mNode->setVisible(false);
 					wallList.push_back(mNode);
 				}
@@ -230,7 +233,7 @@ GameApplication::loadEnv()
 					ParticleSystem* ps = mSceneMgr->createParticleSystem(getNewName(), "Examples/PurpleFountain");
 					Ogre::SceneNode* mNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
 					mNode->attachObject(ps);
-					mNode->setPosition(grid.getPosition(i,j).x, 0.0f, grid.getPosition(i,j).z);
+					mNode->setPosition(grid->getPosition(i,j).x, 0.0f, grid->getPosition(i,j).z);
 				}
 			}
 		}
@@ -246,10 +249,10 @@ GameApplication::loadEnv()
 	objs.clear(); // calls their destructors if there are any. (not good enough)
 	
 	inputfile.close();
-	grid.printToFile(); // see what the initial grid looks like.
+	grid->printToFile(); // see what the initial grid looks like.
 
 	//boundBox = temp->entity->getWorldBoundingBox(true);  //boundBox is the bounding box for the barrel
-	
+	setWorldSpace();
 }
 
 void // Set up lights, shadows, etc
@@ -290,7 +293,9 @@ GameApplication::addTime(Ogre::Real deltaTime)
 			if (!(*iter)->notAtLocation() && !gameOver){
 				houseHealth -= .001;
 				houseHUD->setProgress(houseHUD->getProgress() - .001);
+				houseHUD->setComment("Under Attack!");
 			}
+			else houseHUD->setComment("Safe");
 		}
 
 	if (startGame) yoshPointer->update(deltaTime); //Yoshimi has a different update function
@@ -512,7 +517,8 @@ void GameApplication::createGUI(void)
 	back->hide();
 
 	//House HUD will not display until game starts - decrement health when robots attack
-	houseHUD = mTrayMgr->createProgressBar(TL_TOP, "househealth", "HOUSE", 350.0f, 0.0f);
+	houseHUD = mTrayMgr->createProgressBar(TL_TOP, "househealth", "HOUSE", 350.0f, 200.0f);
+	houseHUD->setComment("Safe");
 	houseHUD->setProgress(1);
 	houseHUD->hide();
 
@@ -582,4 +588,8 @@ void GameApplication::endGame(char condition){
 		mTrayMgr->destroyAllWidgetsInTray(OgreBites::TL_TOP);
 		mTrayMgr->createLabel(OgreBites::TL_CENTER, "end", "YOU'RE A LOSE!!", 300.0f);
 	}
+}
+
+void GameApplication::setWorldSpace(){
+	
 }

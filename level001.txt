@@ -4,7 +4,6 @@ Examples/BeachStones
 Objects
 b Barrel.mesh 3.5 0.0 1
 t tudorhouse.mesh 27.0 0.0 0.05
-2 sinbad.mesh 5.2 0.0 1
 
 Characters
 n ninja.mesh 0.0 0.04
@@ -15,7 +14,7 @@ wwwwwwwwwwwwwwwwwwwwww
 woiiioooooooooooooooow
 woitioonooooooooooooow
 woiiioooooooooooooooow
-woo2ooooooooooooooooow
+woooooooooooooooooooow
 woooooooooooooooooooow
 woooooooooooooooooooow
 woooooooooooooooooooow
