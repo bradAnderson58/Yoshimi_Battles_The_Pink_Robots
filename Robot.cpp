@@ -73,6 +73,8 @@ void Robot::update(Ogre::Real deltaTime){
 
 		if (this->mBodyNode->getPosition().y <= 0){
 			mBodyNode->setPosition(getPosition().x, 0, getPosition().z);
+			//Sometimes this gets messed up here
+			mDirection.y = 0;
 			flying = false;
 			if (health <= 0) setDeath();
 		}
@@ -450,17 +452,22 @@ void Robot::checkBoundaryCollision(){
 	float xBound = (app->getXmax() * 10) - 5;
 	float zBound = (app->getZmax() * 10) - 5;
 
-	if (mBodyNode->getPosition().x <= -xBound || mBodyNode->getPosition().x >= xBound){
+	if (mBodyNode->getPosition().x <= -xBound){
 		//hit bounds in x direction
-		
+		mBodyNode->setPosition(-xBound, mBodyNode->getPosition().y, mBodyNode->getPosition().z);
 		mDirection.x = -mDirection.x;
-		
-
+	}else if ( mBodyNode->getPosition().x >= xBound){
+		mBodyNode->setPosition(xBound, mBodyNode->getPosition().y, mBodyNode->getPosition().z);
+		mDirection.x = -mDirection.x;
 	}
-	if (mBodyNode->getPosition().z <= -zBound || mBodyNode->getPosition().z >= zBound){
+	if (mBodyNode->getPosition().z <= -zBound){
 		//hit bounds in z direction
+		mBodyNode->setPosition( mBodyNode->getPosition().x, mBodyNode->getPosition().y, -zBound);
 		mDirection.z = -mDirection.z;
 		
+	}else if (mBodyNode->getPosition().z >= zBound){
+		
+		mBodyNode->setPosition( mBodyNode->getPosition().x, mBodyNode->getPosition().y, zBound);
+		mDirection.z = -mDirection.z;
 	}
-
 }
