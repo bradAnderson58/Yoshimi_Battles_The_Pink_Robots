@@ -65,7 +65,7 @@ void Yoshimi::updateLocomote(Ogre::Real deltaTime){
 
 	//use direction for forward and backward
 	mDirection = mBodyNode->getOrientation() * Ogre::Vector3::UNIT_Z;
-
+	this->collisionWalls();
 	//90 degrees from mDirection for right and left
 	q.FromAngleAxis(Ogre::Radian(M_PI) / 2, Ogre::Vector3(0,1,0));
 	Ogre::Vector3 side = q*mDirection;
@@ -240,5 +240,24 @@ void Yoshimi::collisionRobots(){
 			temp[1] = 0;
 			setPosition(temp[0], 0, temp[2]);
 		}
+	}
+}
+
+void Yoshimi::collisionWalls(){
+	float maxX = app->getXmax() * 10 -5;
+	float maxZ = app->getZmax() * 10 -5;
+
+	if (getPosition()[0] >= maxX && mDirection[0] > 0){
+		mDirection[0] = 0;
+	}
+	if (getPosition()[0] <= -maxX && mDirection[0] < 0){
+		mDirection[0] = 0;
+	}
+
+	if (getPosition()[2] >= maxZ && mDirection[2] > 0){
+		mDirection[2] = 0;
+	}
+	if (getPosition()[2] <= -maxZ && mDirection[2] < 0){
+		mDirection[2] = 0;
 	}
 }
