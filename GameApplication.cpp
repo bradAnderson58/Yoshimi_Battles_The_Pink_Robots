@@ -227,6 +227,18 @@ GameApplication::loadEnv()
 					mNode->setVisible(false);
 					wallList.push_back(mNode);
 				}
+				else if (c == 'b') // create borderwalls
+				{
+					Entity* ent = mSceneMgr->createEntity(getNewName(), Ogre::SceneManager::PT_CUBE);
+					ent->setMaterialName("Examples/RustySteel");
+					Ogre::SceneNode* mNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+					mNode->attachObject(ent);
+					mNode->scale(0.1f,0.2f,0.1f); // cube is 100 x 100
+					grid->getNode(i,j)->setOccupied();  // indicate that agents can't pass through
+					mNode->setPosition(grid->getPosition(i,j).x, 10.0f, grid->getPosition(i,j).z);
+					mNode->setVisible(true);
+					borderWalls.push_back(mNode);
+				}
 				else if (c == 'e')
 				{
 					ParticleSystem::setDefaultNonVisibleUpdateTimeout(5);  // set nonvisible timeout

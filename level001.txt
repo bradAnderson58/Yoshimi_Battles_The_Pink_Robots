@@ -2,7 +2,7 @@
 Examples/BeachStones
 
 Objects
-b Barrel.mesh 3.5 0.0 1
+d Barrel.mesh 3.5 0.0 1
 t tudorhouse.mesh 27.0 0.0 0.05
 
 Characters
@@ -10,26 +10,26 @@ n ninja.mesh 0.0 0.04
 r robot.mesh 0.0 0.08
 
 World
-owwwwwwwwwwwwwwwwwwwwww
-ooiiiooooooooooooooooow
-ooitioonoooooooooooooow
-ooiiiooooooooooooooooow
-oooooooooooooooooooooow
-oooooooooooooooooooooow
-oooooooooooooooooooooow
-oooooooooooooooooooooow
-oooooooooooooooooooooow
-ooooooooroorrooooooooow
-oooooooooooooooooooooow
-oooooorooooroooooooooow
-oooooooooooroooooooooow
-oooooooooooooroooooooow
-oooooooroorooooooooooow
-oooooooooooooooooooooow
-wooooooooooooooooooooow
-wooooooooooooooooooooow
-wooooooooooooooooooooow
-wooooooooooooooooooooow
-wooooooooooooooooooooow
-wooooooooooooooooooooow
-wwwwwwwwwwwwwwwwwwwwwww
+obbbbbbbbbbbbbbbbbbbbbb
+ooiiiooooooooooooooooob
+ooitioonoooooooooooooob
+ooiiiooooooooooooooooob
+oooooooooooooooooooooob
+oooooooooooooooooooooob
+oooooooooooooooooooooob
+oooooooooooooooooooooob
+oooooooooooooooooooooob
+ooooooooroorrooooooooob
+oooooooooooooooooooooob
+oooooorooooroooooooooob
+oooooooooooroooooooooob
+oooooooooooooroooooooob
+oooooooroorooooooooooob
+oooooooooooooooooooooob
+booooooooooooooooooooob
+booooooooooooooooooooob
+booooooooooooooooooooob
+booooooooooooooooooooob
+booooooooooooooooooooob
+booooooooooooooooooooob
+bbbbbbbbbbbbbbbbbbbbbbb
