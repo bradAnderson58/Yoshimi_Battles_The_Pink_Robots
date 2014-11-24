@@ -554,7 +554,8 @@ void GameApplication::buttonHit(OgreBites::Button* b)
 	{
 		//Delete start GUI and start game
 		if (!startGame){
-			PlaySound(NULL, NULL, NULL);
+			mTrayMgr->hideCursor();
+			PlaySound(NULL, NULL, SND_ASYNC);
 			mTrayMgr->destroyAllWidgetsInTray(OgreBites::TL_CENTER); //going to remove
 			loadEnv();
 			setupEnv();
@@ -599,8 +600,19 @@ void GameApplication::buttonHit(OgreBites::Button* b)
 		texty->hide();
 		back->hide();
 	}else if (b->getName() == "retry"){  //this code restarts after endGame deleted everything
-		loadEnv();
-		setupEnv();
+
+		mTrayMgr->destroyAllWidgetsInTray(OgreBites::TL_CENTER); //going to remove
+		PlaySound(music.c_str(), NULL, SND_FILENAME|SND_ASYNC); 
+
+		agent = NULL; // Init member data
+		housePointer = NULL;
+		startGame = false;
+		houseHealth = 1.0f;
+		gameOver = false;
+		
+		createGUI();
+		//loadEnv();
+		//setupEnv();
 	}
 }
 
@@ -610,6 +622,8 @@ void GameApplication::endGame(char condition){
 	PlaySound(NULL, NULL, NULL);
 	gameOver = true;
 	startGame = false;
+
+	//Delete all scene shit
 	mSceneMgr->clearScene();
 	delete yoshPointer;
 	yoshPointer = NULL;
@@ -617,9 +631,22 @@ void GameApplication::endGame(char condition){
 		delete robo;
 		robo = NULL;
 	}
+
+	//Clear all lists
 	RobotList.clear();
 	wallList.clear();
 	borderWalls.clear();
+
+	//Clear all everything
+	mSceneMgr->getRootSceneNode()->removeAndDestroyAllChildren() ; // destroy all scenenodes
+	mSceneMgr->destroyAllEntities() ;
+	mSceneMgr->destroyAllLights() ;
+	mSceneMgr->destroyAllManualObjects() ;
+	mSceneMgr->destroyAllBillboardSets() ;
+	Ogre::MeshManager::getSingleton().removeAll() ; // this destroys all the meshes
+
+	//Give mouse back
+	mTrayMgr->showCursor();
 
 	if (condition == 'l'){
 		mTrayMgr->destroyAllWidgetsInTray(OgreBites::TL_TOP);
@@ -630,4 +657,6 @@ void GameApplication::endGame(char condition){
 	}
 	OgreBites::Button *retry = mTrayMgr->createButton(OgreBites::TL_CENTER, "retry", "Restart?", 200.0f);
 	mTrayMgr->buttonHit(retry);
+
+	if (mWindow != NULL) std::cout << "Not this" << std::endl;
 }

@@ -17,8 +17,8 @@ Robot::Robot(Ogre::SceneManager* SceneManager, std::string name, std::string fil
 	//mBodyNode->yaw(Ogre::Degree(180)); //fish goes this way
 	//mBodyNode->pitch(Ogre::Degree(180));
 	Ogre::AxisAlignedBox uhh = mBodyEntity->getBoundingBox();
-	mSceneMgr->showBoundingBoxes(true);
-	mBodyNode->showBoundingBox(false);
+	//mSceneMgr->showBoundingBoxes(true);                        //for robots
+	//mBodyNode->showBoundingBox(false);
 	counter = 0;
 	testing = 0;
 	mDirection = Ogre::Vector3(-.05,0,0);//Ogre::Vector3::ZERO;
