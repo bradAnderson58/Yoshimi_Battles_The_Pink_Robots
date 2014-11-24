@@ -91,7 +91,7 @@ GameApplication::loadEnv()
 	//mMouse = NULL;								//How to hide the mouse?
 	//mMouse->getMouseState();
 	
-	GridNode *temp;  //FOR TESTING REMOVE
+	GridNode *temp;
 
 	ifstream inputfile;		// Holds a pointer into the file
 
@@ -266,6 +266,8 @@ GameApplication::loadEnv()
 	//set up world boundaries
 	xMax = (grid->getRows() - 1) / 2;
 	zMax = (grid->getCols() - 1) / 2;
+
+	agent = NULL;	//this gets deleted by yoshPointer or RobotList
 }
 
 void // Set up lights, shadows, etc
@@ -298,28 +300,29 @@ GameApplication::setupEnv()
 void
 GameApplication::addTime(Ogre::Real deltaTime)
 {
-	int dead = 0;  //see how many robots are dead
-	std::string comment = "Safe";
-	// Iterate over the list of agents (robots)
-	std::list<Robot*>::iterator iter;
-	for (iter = RobotList.begin(); iter != RobotList.end(); iter++){
-		if (*iter != NULL){
-			(*iter)->update(deltaTime);
-			if (!(*iter)->notAtLocation() && !gameOver){
-				houseHealth -= .001;
-				houseHUD->setProgress(houseHUD->getProgress() - .001);
-				comment = "Under Attack!";
+	if (!gameOver){
+		int dead = 0;  //see how many robots are dead
+		std::string comment = "Safe";
+		// Iterate over the list of agents (robots)
+		std::list<Robot*>::iterator iter;
+		for (iter = RobotList.begin(); iter != RobotList.end(); iter++){
+			if (*iter != NULL){
+				(*iter)->update(deltaTime);
+				if (!(*iter)->notAtLocation() && !gameOver){
+					houseHealth -= .001;
+					houseHUD->setProgress(houseHUD->getProgress() - .001);
+					comment = "Under Attack!";
+				}
 			}
+			if (!(*iter)->notDead()) dead++;
 		}
-		if (!(*iter)->notDead()) dead++;
-	}
-	if (!gameOver) houseHUD->setComment(comment);  //warn if house is under attack
+		if (!gameOver) houseHUD->setComment(comment);  //warn if house is under attack
 
-	if (startGame) yoshPointer->update(deltaTime); //Yoshimi has a different update function
+		if (startGame) yoshPointer->update(deltaTime); //Yoshimi has a different update function
 	
-	if (houseHealth <= 0 && !gameOver) endGame('l');
-	if (dead != 0 && dead == RobotList.size() && !gameOver) endGame('w'); 
-
+		if (houseHealth <= 0 && !gameOver) endGame('l');
+		if (dead != 0 && dead == RobotList.size() && !gameOver) endGame('w'); 
+	}
 }
 
 bool 
@@ -422,17 +425,17 @@ GameApplication::keyPressed( const OIS::KeyEvent &arg ) // Moved from BaseApplic
 	}
 	else if (arg.key == OIS::KC_W) {
 		
-		yoshPointer->setMovement('f', true);
+		if (startGame) yoshPointer->setMovement('f', true);
 	}
 	else if (arg.key == OIS::KC_A) {
-		yoshPointer->setMovement('l', true);
+		if (startGame) yoshPointer->setMovement('l', true);
 	}
 	else if (arg.key == OIS::KC_D) {
-		yoshPointer->setMovement('r', true);
+		if (startGame) yoshPointer->setMovement('r', true);
 	
 	}
 	else if (arg.key == OIS::KC_S) {
-		yoshPointer->setMovement('b', true);
+		if (startGame) yoshPointer->setMovement('b', true);
 	}
 	//Some wicked attacks
 	else if (arg.key == OIS::KC_Q){
@@ -449,11 +452,12 @@ GameApplication::keyPressed( const OIS::KeyEvent &arg ) // Moved from BaseApplic
 bool GameApplication::keyReleased( const OIS::KeyEvent &arg )
 {
 	//Set the flag to false for whichever key is no longer pressed
-	if (arg.key == OIS::KC_W) yoshPointer->setMovement('f', false);
-	else if (arg.key == OIS::KC_A) yoshPointer->setMovement('l', false);
-	else if (arg.key == OIS::KC_S) yoshPointer->setMovement('b', false);
-	else if (arg.key == OIS::KC_D) yoshPointer->setMovement('r', false);
-
+	if (startGame){
+		if (arg.key == OIS::KC_W) yoshPointer->setMovement('f', false);
+		else if (arg.key == OIS::KC_A) yoshPointer->setMovement('l', false);
+		else if (arg.key == OIS::KC_S) yoshPointer->setMovement('b', false);
+		else if (arg.key == OIS::KC_D) yoshPointer->setMovement('r', false);
+	}
     //mCameraMan->injectKeyUp(arg);
     return true;
 }
@@ -602,6 +606,16 @@ void GameApplication::endGame(char condition){
 
 	PlaySound(NULL, NULL, NULL);
 	gameOver = true;
+	startGame = false;
+	mSceneMgr->clearScene();
+	delete yoshPointer;
+	yoshPointer = NULL;
+	for (Robot *robo : RobotList){
+		//delete robo;
+		//robo = NULL;
+	}
+	RobotList.clear();
+
 	if (condition == 'l'){
 		mTrayMgr->destroyAllWidgetsInTray(OgreBites::TL_TOP);
 		mTrayMgr->createLabel(OgreBites::TL_CENTER, "end", "YOU'RE A LOSE!!", 300.0f);

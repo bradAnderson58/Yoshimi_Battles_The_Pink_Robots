@@ -51,6 +51,11 @@ Yoshimi::Yoshimi(Ogre::SceneManager* SceneManager, std::string name, std::string
 	setupAnimations();
 }
 
+Yoshimi::~Yoshimi(void)
+{
+	
+}
+
 void Yoshimi::update(Ogre::Real deltaTime){
 	this->updateAnimations(deltaTime);	// Update animation playback
 	this->updateLocomote(deltaTime);	// Update Locomotion
