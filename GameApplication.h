@@ -73,6 +73,7 @@ public:
 	Ogre::SceneNode* getHousePointer(){return housePointer;}
 
 	void endGame(char condition);		//End the game in either victory or crushing defeat
+	void destroyallChildren(Ogre::SceneNode* p);
 
 protected:
     virtual void createScene(void);

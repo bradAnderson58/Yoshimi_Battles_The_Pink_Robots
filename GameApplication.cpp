@@ -599,8 +599,9 @@ void GameApplication::buttonHit(OgreBites::Button* b)
 		texty->hide();
 		back->hide();
 	}else if (b->getName() == "retry"){  //this code restarts after endGame deleted everything
-		loadEnv();
-		setupEnv();
+		gameOver = false;
+		houseHealth = 1.0;
+		createGUI();
 	}
 }
 
@@ -610,7 +611,20 @@ void GameApplication::endGame(char condition){
 	PlaySound(NULL, NULL, NULL);
 	gameOver = true;
 	startGame = false;
+	Ogre::SceneNode* temp = mSceneMgr->getRootSceneNode();
+	//destroyallChildren(temp);
+	//mSceneMgr->destroySceneNode(temp);
 	mSceneMgr->clearScene();
+	//mRoot->destroySceneManager(mSceneMgr);
+	//mRoot->getTimer()->reset();
+	mSceneMgr = mRoot->createSceneManager(Ogre::ST_GENERIC);
+    mSceneMgr->addRenderQueueListener(mOverlaySystem);
+	mCamera = mSceneMgr->createCamera("PlayerCam");
+	mCamera->setPosition(Ogre::Vector3(0,60,60));
+     //Look back along -Z
+    mCamera->lookAt(Ogre::Vector3(0,0,-50));
+    mCamera->setNearClipDistance(5);
+	mCameraMan = new OgreBites::SdkCameraMan(mCamera);
 	delete yoshPointer;
 	yoshPointer = NULL;
 	for (Robot *robo : RobotList){
@@ -630,4 +644,21 @@ void GameApplication::endGame(char condition){
 	}
 	OgreBites::Button *retry = mTrayMgr->createButton(OgreBites::TL_CENTER, "retry", "Restart?", 200.0f);
 	mTrayMgr->buttonHit(retry);
+}
+
+void GameApplication::destroyallChildren(Ogre::SceneNode* p){
+	Ogre::SceneNode::ObjectIterator it = p->getAttachedObjectIterator();
+	while (it.hasMoreElements()){
+		Ogre::MovableObject* o = static_cast<Ogre::MovableObject*>(it.getNext());
+		p->getCreator()->destroyMovableObject(o);
+	}
+
+	Ogre::SceneNode::ChildNodeIterator itChild = p->getChildIterator();
+
+   while ( itChild.hasMoreElements() )
+   {
+      Ogre::SceneNode* pChildNode = static_cast<Ogre::SceneNode*>(itChild.getNext());
+      destroyallChildren( pChildNode );
+   }
+
 }
