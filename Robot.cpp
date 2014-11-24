@@ -361,8 +361,10 @@ Ogre::Vector3 Robot::flockingNormal(){				//need to add stuff to gameapplication
 				diff[0] = temp[0] - temp2[0];
 				diff[1] = temp[1] - temp2[1];
 				diff[2] = temp[2] - temp2[2];
-				diffMag = sqrt(pow(diff[0], 2) + pow(diff[1],2) + pow(diff[2], 2));
-				seperation += weight * (diff/(diffMag*diffMag));
+				diffMag = diff.length();
+				if (diffMag != 0){
+					seperation += weight * (diff/(diffMag*diffMag));
+				}
 				//calculate alignment portion	
 				alignment += weight * (*aIter)->mDirection;
 				weightsum += weight;
@@ -451,7 +453,7 @@ void Robot::setFlyback(int velocity,Ogre::Vector3 dir){
 	flying = true;
 	atLocation = false;
 	// set up the initial state
-	initPos = mBodyNode->getPosition();
+	flyPos = mBodyNode->getPosition();
 	mDirection.x = -dir[0] * velocity;									
 	mDirection.y = 0.707 * velocity;				//y and z values are determined by the angle of trajectory multiplied by velocity
 	mDirection.z = -dir[2] * velocity;
@@ -541,4 +543,16 @@ void Robot::RobotCollisions(){
 			}
 		}
 	}
+}
+
+void Robot::restart(){
+	mBodyNode->setPosition(initPos);
+	state = NORMAL;
+	flying = false;
+	dead = false;
+	atLocation = false;
+	fleeSet = false;
+	closeFriendDied = false;
+	playingShoot = false;
+	health = 100;
 }

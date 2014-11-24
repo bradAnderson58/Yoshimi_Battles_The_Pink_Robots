@@ -27,6 +27,7 @@ private:
 	//Boundaries of the world
 	Grid *grid;
 	float xMax, zMax;
+	void restartLevel();
 
 public:	
 

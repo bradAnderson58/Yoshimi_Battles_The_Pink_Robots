@@ -25,6 +25,8 @@ public:
 	void checkHits(char attack);  //for attacks - check if a robot gets hit
 	void checkBump();
 	Ogre::Vector3 getPosition(){return mBodyNode->getPosition();}
+	void restart();
+	void setInitPos(Ogre::Vector3 p){initPos = p;}
 
 private:
 	bool fForward; //how am I moving? Each flag indicates a direction

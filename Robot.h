@@ -32,6 +32,8 @@ public:
 	void setFriendDied(){closeFriendDied = true;}
 	void setAngry(){state = ANGRY;}
 	void RobotCollisions();
+	void restart();
+	void setInitPos(Ogre::Vector3 p){initPos = p;}
 
 private:
 	enum State{
@@ -76,6 +78,7 @@ private:
 	bool fleeSet;
 	bool closeFriendDied;
 	bool playingShoot;
+	Ogre::Vector3 flyPos;
 	std::string shoot;
 	std::string die;
 };

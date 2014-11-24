@@ -30,7 +30,7 @@ Agent::Agent(Ogre::SceneManager* SceneManager, std::string name, std::string fil
 
 
 	//setupAnimations();  // load the animation for this character
-
+	initPos = mBodyNode->getPosition();
 	projectile = false; // lecture 12
 	ParticleSystem::setDefaultNonVisibleUpdateTimeout(5);  // set nonvisible timeout
 	//ps = mSceneMgr->createParticleSystem("Fountain1", "Examples/PurpleFountain");

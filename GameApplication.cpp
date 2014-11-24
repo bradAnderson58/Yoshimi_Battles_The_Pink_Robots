@@ -183,9 +183,11 @@ GameApplication::loadEnv()
 						agent = new Yoshimi(this->mSceneMgr, getNewName(), rent->filename, rent->y, rent->scale, this);
 						yoshPointer = (Yoshimi*) agent;  //you are a yoshimi
 						agent->setPosition(grid->getPosition(i,j).x, 0, grid->getPosition(i,j).z);
+						yoshPointer->setInitPos(yoshPointer->getPosition());
 					}else {
 						Robot* robot = new Robot(this->mSceneMgr, getNewName(), rent->filename, rent->y, rent->scale, this);
 						robot->setPosition(grid->getPosition(i,j).x, 0, grid->getPosition(i,j).z);
+						robot->setInitPos(robot->getPosition());
 						RobotList.push_back(robot);
 					}
 					//agent->setApp(this);  //in constructor
@@ -600,20 +602,10 @@ void GameApplication::buttonHit(OgreBites::Button* b)
 		texty->hide();
 		back->hide();
 	}else if (b->getName() == "retry"){  //this code restarts after endGame deleted everything
-		gameOver = false;
-		houseHealth = 1.0;
-		createGUI();
+		restartLevel();
 
-		mTrayMgr->destroyAllWidgetsInTray(OgreBites::TL_CENTER); //going to remove
 		PlaySound(music.c_str(), NULL, SND_FILENAME|SND_ASYNC); 
 
-		agent = NULL; // Init member data
-		housePointer = NULL;
-		startGame = false;
-		houseHealth = 1.0f;
-		gameOver = false;
-		
-		createGUI();
 		//loadEnv();
 		//setupEnv();
 	}
@@ -625,50 +617,12 @@ void GameApplication::endGame(char condition){
 	PlaySound(NULL, NULL, NULL);
 	gameOver = true;
 	startGame = false;
-	Ogre::SceneNode* temp = mSceneMgr->getRootSceneNode();
-	//destroyallChildren(temp);
-	//mSceneMgr->destroySceneNode(temp);
-
-	//Delete all scene shit
-	mSceneMgr->clearScene();
-	//mRoot->destroySceneManager(mSceneMgr);
-	//mRoot->getTimer()->reset();
-	mSceneMgr = mRoot->createSceneManager(Ogre::ST_GENERIC);
-    mSceneMgr->addRenderQueueListener(mOverlaySystem);
-	mCamera = mSceneMgr->createCamera("PlayerCam");
-	mCamera->setPosition(Ogre::Vector3(0,60,60));
-     //Look back along -Z
-    mCamera->lookAt(Ogre::Vector3(0,0,-50));
-    mCamera->setNearClipDistance(5);
-	mCameraMan = new OgreBites::SdkCameraMan(mCamera);
-	delete yoshPointer;
-	yoshPointer = NULL;
-	for (Robot *robo : RobotList){
-		delete robo;
-		robo = NULL;
-	}
-
-	//Clear all lists
-	RobotList.clear();
-	wallList.clear();
-	borderWalls.clear();
-
-	//Clear all everything
-	mSceneMgr->getRootSceneNode()->removeAndDestroyAllChildren() ; // destroy all scenenodes
-	mSceneMgr->destroyAllEntities() ;
-	mSceneMgr->destroyAllLights() ;
-	mSceneMgr->destroyAllManualObjects() ;
-	mSceneMgr->destroyAllBillboardSets() ;
-	Ogre::MeshManager::getSingleton().removeAll() ; // this destroys all the meshes
-
 	//Give mouse back
 	mTrayMgr->showCursor();
 
 	if (condition == 'l'){
-		mTrayMgr->destroyAllWidgetsInTray(OgreBites::TL_TOP);
 		mTrayMgr->createLabel(OgreBites::TL_CENTER, "end", "YOU'RE A LOSE!!", 300.0f);
 	}else if (condition == 'w'){
-		mTrayMgr->destroyAllWidgetsInTray(OgreBites::TL_TOP);
 		mTrayMgr->createLabel(OgreBites::TL_CENTER, "end2", "YOU ARE WINNER!!", 300.0f);
 	}
 	OgreBites::Button *retry = mTrayMgr->createButton(OgreBites::TL_CENTER, "retry", "Restart?", 200.0f);
@@ -692,4 +646,19 @@ void GameApplication::destroyallChildren(Ogre::SceneNode* p){
       destroyallChildren( pChildNode );
    }
 
+}
+
+void GameApplication::restartLevel(){
+	for(Robot* r : RobotList){
+		r->restart();
+	}
+	yoshPointer->restart();
+	houseHealth = 1.0;
+	startGame = true;
+	houseHealth = 1.0f;
+	gameOver = false;
+	mTrayMgr->destroyAllWidgetsInTray(OgreBites::TL_CENTER);
+	houseHUD->setProgress(houseHealth);
+	mTrayMgr->hideCursor();
+	
 }

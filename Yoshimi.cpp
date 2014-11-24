@@ -294,3 +294,10 @@ void Yoshimi::collisionRobots(){
 void Yoshimi::collisionWalls(){
 	
 }
+
+void Yoshimi::restart(){
+	mBodyNode->setPosition(initPos);
+	mBodyNode->yaw(Ogre::Radian(M_PI));
+	fForward = fBackward = fRight = fLeft = false;  //starts by not moving
+	doingStuff = false;  //starts not doing anything
+}
