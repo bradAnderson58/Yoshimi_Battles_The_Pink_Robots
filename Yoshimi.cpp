@@ -25,7 +25,7 @@ Yoshimi::Yoshimi(Ogre::SceneManager* SceneManager, std::string name, std::string
 	doingStuff = false;  //starts not doing anything
 	speed = 2;	//Yoshimi a quick one 
 
-	mBodyNode->showBoundingBox(true); //for testing purposes
+	//mBodyNode->showBoundingBox(true);										//for testing purposes Yoshimi box
 
 	//attack space
 	mAttackNode = mBodyNode->createChildSceneNode();
@@ -36,7 +36,7 @@ Yoshimi::Yoshimi(Ogre::SceneManager* SceneManager, std::string name, std::string
 	//set up the position of the attackNode
 	mAttackNode->setPosition(0.0f ,100.0f, -100.0f);
 	mAttackNode->setVisible(false);
-	mAttackNode->showBoundingBox(true);  //for testing
+	//mAttackNode->showBoundingBox(true);											//for testing  Attack box
 	
 	//use this to check animations if needed
 	/*Ogre::AnimationStateSet* aSet = mBodyEntity->getAllAnimationStates();
