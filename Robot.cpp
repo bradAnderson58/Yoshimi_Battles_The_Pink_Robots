@@ -35,6 +35,7 @@ Robot::Robot(Ogre::SceneManager* SceneManager, std::string name, std::string fil
 	atLocation = false;
 	fleeSet = false;
 	closeFriendDied = false;
+	playingShoot = false;
 	health = 100;
 	if(rand() % 2 == 0){
 		goRight = true;
@@ -43,6 +44,13 @@ Robot::Robot(Ogre::SceneManager* SceneManager, std::string name, std::string fil
 		goRight = false;
 	}
 
+	shoot = __FILE__; //gets the current cpp file's path with the cpp file
+	shoot = shoot.substr(0,1+shoot.find_last_of('\\')); //removes filename to leave path
+	shoot += "\\Sounds\\robotShooting.wav";
+
+	die = __FILE__; //gets the current cpp file's path with the cpp file
+	die = shoot.substr(0,1+shoot.find_last_of('\\')); //removes filename to leave path
+	die += "\\Sounds\\r2d2dying.wav";
 }
 
 void Robot::update(Ogre::Real deltaTime){
@@ -55,9 +63,19 @@ void Robot::update(Ogre::Real deltaTime){
 										  	// Update animation playback
 		this->updateLocomote(deltaTime);	// Update Locomotion
 
-		if (atLocation && robAnim != SHOOT){
-			this->setAnimation(SHOOT);
+		if (atLocation){
+			if (robAnim != SHOOT){
+				this->setAnimation(SHOOT);
+			}
+			/*if (!playingShoot){
+				PlaySound(shoot.c_str(), NULL, SND_FILENAME|SND_ASYNC|SND_LOOP);
+				playingShoot = true;
+			}*/
 		}
+		/*else{
+			PlaySound(NULL, 0,SND_ASYNC);
+			playingShoot = false;
+		}*/
 	}
 
 	//Knockback code (similar to fish 'shoot' method)

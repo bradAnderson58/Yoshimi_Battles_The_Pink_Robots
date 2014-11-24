@@ -74,6 +74,9 @@ private:
 	bool goRight;
 	bool fleeSet;
 	bool closeFriendDied;
+	bool playingShoot;
+	std::string shoot;
+	std::string die;
 };
 
 #endif
