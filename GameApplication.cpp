@@ -598,6 +598,9 @@ void GameApplication::buttonHit(OgreBites::Button* b)
 		cred->show();
 		texty->hide();
 		back->hide();
+	}else if (b->getName() == "retry"){  //this code restarts after endGame deleted everything
+		loadEnv();
+		setupEnv();
 	}
 }
 
@@ -611,10 +614,12 @@ void GameApplication::endGame(char condition){
 	delete yoshPointer;
 	yoshPointer = NULL;
 	for (Robot *robo : RobotList){
-		//delete robo;
-		//robo = NULL;
+		delete robo;
+		robo = NULL;
 	}
 	RobotList.clear();
+	wallList.clear();
+	borderWalls.clear();
 
 	if (condition == 'l'){
 		mTrayMgr->destroyAllWidgetsInTray(OgreBites::TL_TOP);
@@ -623,4 +628,6 @@ void GameApplication::endGame(char condition){
 		mTrayMgr->destroyAllWidgetsInTray(OgreBites::TL_TOP);
 		mTrayMgr->createLabel(OgreBites::TL_CENTER, "end2", "YOU ARE WINNER!!", 300.0f);
 	}
+	OgreBites::Button *retry = mTrayMgr->createButton(OgreBites::TL_CENTER, "retry", "Restart?", 200.0f);
+	mTrayMgr->buttonHit(retry);
 }
