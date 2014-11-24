@@ -600,11 +600,9 @@ void GameApplication::buttonHit(OgreBites::Button* b)
 		texty->hide();
 		back->hide();
 	}else if (b->getName() == "retry"){  //this code restarts after endGame deleted everything
-<<<<<<< HEAD
 		gameOver = false;
 		houseHealth = 1.0;
 		createGUI();
-=======
 
 		mTrayMgr->destroyAllWidgetsInTray(OgreBites::TL_CENTER); //going to remove
 		PlaySound(music.c_str(), NULL, SND_FILENAME|SND_ASYNC); 
@@ -618,7 +616,6 @@ void GameApplication::buttonHit(OgreBites::Button* b)
 		createGUI();
 		//loadEnv();
 		//setupEnv();
->>>>>>> 7c96785571c226de0ad1aae02510f9fe5818525e
 	}
 }
 
@@ -628,14 +625,11 @@ void GameApplication::endGame(char condition){
 	PlaySound(NULL, NULL, NULL);
 	gameOver = true;
 	startGame = false;
-<<<<<<< HEAD
 	Ogre::SceneNode* temp = mSceneMgr->getRootSceneNode();
 	//destroyallChildren(temp);
 	//mSceneMgr->destroySceneNode(temp);
-=======
 
 	//Delete all scene shit
->>>>>>> 7c96785571c226de0ad1aae02510f9fe5818525e
 	mSceneMgr->clearScene();
 	//mRoot->destroySceneManager(mSceneMgr);
 	//mRoot->getTimer()->reset();

@@ -153,7 +153,7 @@ void Robot::updateLocomote(Ogre::Real deltaTime){
 			Ogre::Quaternion quat = src.getRotationTo(mDirection.normalisedCopy());
 			mBodyNode->rotate(quat);
 		}
-		mDirection = mDirection * 100;
+		//mDirection = mDirection * 100;
 		mBodyNode->translate(mDirection);
 	}
 	else{//when velocity is zero set idle animations
