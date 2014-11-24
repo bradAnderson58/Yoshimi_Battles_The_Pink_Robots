@@ -53,6 +53,11 @@ Robot::Robot(Ogre::SceneManager* SceneManager, std::string name, std::string fil
 	die += "\\Sounds\\r2d2dying.wav";
 }
 
+Robot::~Robot(void)
+{
+	
+}
+
 void Robot::update(Ogre::Real deltaTime){
 	if (health < 30){
 		state = HURT;
