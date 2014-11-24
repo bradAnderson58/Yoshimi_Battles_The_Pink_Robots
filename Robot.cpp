@@ -62,12 +62,11 @@ void Robot::update(Ogre::Real deltaTime){
 	if (health < 30){
 		state = HURT;
 	}
-	
 	this->updateAnimations(deltaTime);	// Update animation playback
 	if (!flying && !dead){
 										  	// Update animation playback
 		this->updateLocomote(deltaTime);	// Update Locomotion
-
+		this->RobotCollisions();
 		if (atLocation){
 			if (robAnim != SHOOT){
 				this->setAnimation(SHOOT);
@@ -121,7 +120,15 @@ void Robot::updateLocomote(Ogre::Real deltaTime){
 		}
 	}
 	else if (state == ANGRY){
-		mDirection = flockingSeek();
+		Ogre::Real dist = mBodyNode->getPosition().distance(yoshPos);
+		if (dist < 50){
+			mDirection = flockingSeek();
+			fleeSet = true;
+		}
+		else{
+			mDirection = flockingNormal();
+			fleeSet = false;
+		}
 	}
 	else{
 		mDirection = Ogre::Vector3::ZERO;
@@ -398,7 +405,7 @@ Ogre::Vector3 Robot::flockingNormal(){				//need to add stuff to gameapplication
 	omgwork[1] = 0;
 
 	//the constants and parts of the velocity put together.
-	vel = .01 * alignment + 1.5 * seperation + .05 * cohesion +  .05 * omgwork;
+	vel = .01 * alignment + 1.5 * seperation + .01 * cohesion +  .05 * omgwork;
 
 	return vel;
 }
@@ -515,6 +522,23 @@ void Robot::checkBoundaryCollision(){
 			}
 		}
 	}
+}
 
-
+void Robot::RobotCollisions(){
+	Ogre::Vector3 temp(0,0,0);
+	Ogre::Vector3 pos = mBodyNode->getPosition();
+	Ogre::Vector3 rPos(0,0,0);
+	std::list<Robot*> robots = app->getRobotList();
+	for (Robot* rob : robots){
+		if (rob != this && rob->notDead()){
+			rPos = rob->getPosition();
+			if (mBodyNode->getPosition().distance(rob->getPosition()) < 3){
+				temp = pos - rPos;
+				temp.normalise();
+				temp = rPos + (temp * 3);
+				temp[1] = 0;
+				setPosition(temp[0], 0, temp[2]);
+			}
+		}
+	}
 }

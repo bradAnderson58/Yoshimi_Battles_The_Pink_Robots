@@ -31,6 +31,7 @@ public:
 	bool notFleeing(){return !fleeSet;}
 	void setFriendDied(){closeFriendDied = true;}
 	void setAngry(){state = ANGRY;}
+	void RobotCollisions();
 
 private:
 	enum State{
