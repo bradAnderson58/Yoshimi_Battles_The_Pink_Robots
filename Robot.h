@@ -53,6 +53,8 @@ private:
 		ANIM_NONE
 	};
 
+	Ogre::ParticleSystem *ps; //shooting them guns
+
 	State state;
 	AnimID robAnim;
 	Ogre::Vector3 mDirection;

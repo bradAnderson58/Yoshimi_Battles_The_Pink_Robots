@@ -44,6 +44,15 @@ Robot::Robot(Ogre::SceneManager* SceneManager, std::string name, std::string fil
 		goRight = false;
 	}
 
+	Ogre::ParticleSystem::setDefaultNonVisibleUpdateTimeout(5);  // set nonvisible timeout
+	ps = mSceneMgr->createParticleSystem(mBodyNode->getName() + "fountain", "Examples/PurpleFountain");
+	Ogre::SceneNode* mnode = mBodyNode->createChildSceneNode();
+	mnode->roll(Ogre::Degree(-90));
+	mnode->setPosition(0,50,0);
+	mnode->attachObject(ps);
+	ps->setVisible(false);
+
+	//File sound dissappinting :(
 	shoot = __FILE__; //gets the current cpp file's path with the cpp file
 	shoot = shoot.substr(0,1+shoot.find_last_of('\\')); //removes filename to leave path
 	shoot += "\\Sounds\\robotShooting.wav";
@@ -70,6 +79,7 @@ void Robot::update(Ogre::Real deltaTime){
 		if (atLocation){
 			if (robAnim != SHOOT){
 				this->setAnimation(SHOOT);
+				ps->setVisible(true);
 			}
 			/*if (!playingShoot){
 				PlaySound(shoot.c_str(), NULL, SND_FILENAME|SND_ASYNC|SND_LOOP);
@@ -393,6 +403,7 @@ Ogre::Vector3 Robot::flockingNormal(){				//need to add stuff to gameapplication
 	}
 	else if (distance < 100){
 		atLocation = false;
+		
 		omgwork = getSpecificPos();
 		omgwork = omgwork - mBodyNode->getPosition();
 		omgwork.normalise();
@@ -446,6 +457,7 @@ void Robot::getHit(char attack, Ogre::Vector3 dir){
 		health -= 20;
 		setFlyback(15, dir);
 	}
+	ps->setVisible(false);	//no longer shooting while hit
 }
 
 //Similar to 'fire' method in fish game.  We will knock this robot back
@@ -555,5 +567,6 @@ void Robot::restart(){
 	closeFriendDied = false;
 	playingShoot = false;
 	health = 100;
-	setAnimation(DIE, true);
+	setAnimation(DIE, true);  //reset die animation fixes reload bug
+	ps->setVisible(false);	//make sure these fellas stop shooting
 }
