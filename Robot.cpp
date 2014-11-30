@@ -555,4 +555,5 @@ void Robot::restart(){
 	closeFriendDied = false;
 	playingShoot = false;
 	health = 100;
+	setAnimation(DIE, true);
 }

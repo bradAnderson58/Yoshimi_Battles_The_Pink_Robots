@@ -620,15 +620,17 @@ void GameApplication::endGame(char condition){
 	//Give mouse back
 	mTrayMgr->showCursor();
 
+	//Display is different based on if the player won or lost
 	if (condition == 'l'){
 		mTrayMgr->createLabel(OgreBites::TL_CENTER, "end", "YOU'RE A LOSE!!", 300.0f);
 	}else if (condition == 'w'){
 		mTrayMgr->createLabel(OgreBites::TL_CENTER, "end2", "YOU ARE WINNER!!", 300.0f);
 	}
+
+	//option to retry or continue?
 	OgreBites::Button *retry = mTrayMgr->createButton(OgreBites::TL_CENTER, "retry", "Restart?", 200.0f);
 	mTrayMgr->buttonHit(retry);
 
-	if (mWindow != NULL) std::cout << "Not this" << std::endl;
 }
 
 void GameApplication::destroyallChildren(Ogre::SceneNode* p){
