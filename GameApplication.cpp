@@ -19,16 +19,16 @@ GameApplication::GameApplication(void):
 	//set up these strings for later usages
 	std::stringstream ins;	// a stream for outputing to a string (why no clear()?)
 	std::stringstream cre;
-	ins << "\nYour name is Yoshimi, you're a blackbelt in Karate";
-	ins << "\nMOVE: WASD moves Yoshimi as you would expect.  Mouse movements rotate Yoshimi to face different directions.";
-	ins <<"\nATTACK: Left mouse click executes Judo Sword Attack, right mouse click executes Epic Front Kick.";
-	ins <<"\n\nOBJECTIVE:  You must protect your house from the evil natured Robots, who are programmed to destroy us!";
+	ins << "Your name is Yoshimi, you're a blackbelt in Karate";
+	ins << "\nMOVE: \nWASD moves Yoshimi as you would expect.  \nMouse movements rotate Yoshimi to face different directions.";
+	ins <<"\nATTACK: \nLeft mouse click executes Judo Sword Attack, right mouse click executes Epic Front Kick.";
+	ins <<"\nOBJECTIVE:  \nYou must protect your house from the evil natured Robots, who are programmed to destroy us!";
 	instruction = ins.str();
 	//out.clear();
 
-	cre << "\nInspiration and music taken from \"Yoshimi Battles the Pink Robots\" by The Flaming Lips.";
+	cre << "Inspiration and music taken from \"Yoshimi Battles the Pink Robots\" by The Flaming Lips.";
 	cre << "\nGraphics made with assistance of the Ogre Rendering Engine API.";
-	cre << "\nLEAD DEVELOPERS:  Brad Anderson and Kevin Dec, \nDangling Pointers LLC";
+	cre << "\nLEAD DEVELOPERS:  \nBrad Anderson and Kevin Dec, \nDangling Pointers LLC";
 	credits = cre.str();
 
 	music = __FILE__; //gets the current cpp file's path with the cpp file
