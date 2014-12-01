@@ -542,14 +542,30 @@ void Robot::checkBoundaryCollision(){
 	float xDist = myPos.x - house.x;
 	float zDist = myPos.z - house.z;
 
-	if (dist < 22){
-		if (xDist <= 15.0 && zDist <= 18.0){  //robot hits the house
-			if (xDist < zDist){
-				mBodyNode->setPosition(myPos.x, myPos.y, house.z + 18.0);
-				mDirection.z = -mDirection.z;
-			}else{
-				mBodyNode->setPosition(house.x + 15.0, myPos.y, myPos.z);
+	if (dist < 25){
+
+		if ((xDist <= 15.0 && xDist >= -18.0) && (zDist <= 18.0 && zDist >= -18.0)){ //robot hits the house
+
+			//We hit the house in the x direction
+			if (abs(xDist) > abs(zDist)){
+				
+				//Right side of the house
+				if (xDist > 0) mBodyNode->setPosition(house.x + 15, myPos.y, myPos.z);
+				
+				//Left side of the house
+				else mBodyNode->setPosition(house.x - 18, myPos.y, myPos.z);
+
 				mDirection.x = -mDirection.x;
+			//We hit the house in the z direction
+			}else{
+
+				//Front of  the house?
+				if ( zDist > 0) mBodyNode->setPosition(myPos.x, myPos.y, house.z + 18);
+				
+				//Back of the house
+				else mBodyNode->setPosition(myPos.x, myPos.y, house.z - 18);
+				
+				mDirection.z = -mDirection.z;
 			}
 		}
 	}
