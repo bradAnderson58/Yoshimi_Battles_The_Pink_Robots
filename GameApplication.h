@@ -23,11 +23,12 @@ private:
 	std::list<Ogre::SceneNode*> wallList;
 	std::list<Ogre::SceneNode*> borderWalls;
 	Ogre::AxisAlignedBox boundBox;  //bounding box of the barrel
-
+	int level;
 	//Boundaries of the world
 	Grid *grid;
 	float xMax, zMax;
 	void restartLevel();
+	void nextLevel();
 
 public:	
 

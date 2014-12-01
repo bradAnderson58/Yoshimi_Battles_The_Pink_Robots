@@ -14,6 +14,7 @@ GameApplication::GameApplication(void):
 	startGame = false;
 	houseHealth = 1.0f;
 	gameOver = false;
+	level = 0;
 	
 	//set up these strings for later usages
 	std::stringstream ins;	// a stream for outputing to a string (why no clear()?)
@@ -608,6 +609,14 @@ void GameApplication::buttonHit(OgreBites::Button* b)
 
 		//loadEnv();
 		//setupEnv();
+	}else if (b->getName() == "next"){  //this code restarts after endGame deleted everything
+		level++;
+		nextLevel();
+
+		PlaySound(music.c_str(), NULL, SND_FILENAME|SND_ASYNC); 
+
+		//loadEnv();
+		//setupEnv();
 	}
 }
 
@@ -623,13 +632,13 @@ void GameApplication::endGame(char condition){
 	//Display is different based on if the player won or lost
 	if (condition == 'l'){
 		mTrayMgr->createLabel(OgreBites::TL_CENTER, "end", "YOU'RE A LOSE!!", 300.0f);
+		OgreBites::Button *retry = mTrayMgr->createButton(OgreBites::TL_CENTER, "retry", "Restart?", 200.0f);
+		mTrayMgr->buttonHit(retry);
 	}else if (condition == 'w'){
 		mTrayMgr->createLabel(OgreBites::TL_CENTER, "end2", "YOU ARE WINNER!!", 300.0f);
+		OgreBites::Button *next = mTrayMgr->createButton(OgreBites::TL_CENTER, "next", "Next Level?", 200.0f);
+		mTrayMgr->buttonHit(next);
 	}
-
-	//option to retry or continue?
-	OgreBites::Button *retry = mTrayMgr->createButton(OgreBites::TL_CENTER, "retry", "Restart?", 200.0f);
-	mTrayMgr->buttonHit(retry);
 
 }
 
@@ -663,4 +672,47 @@ void GameApplication::restartLevel(){
 	houseHUD->setProgress(houseHealth);
 	mTrayMgr->hideCursor();
 	
+}
+
+void GameApplication::nextLevel(){
+	Ogre::Vector3 housePos;
+	if (level == 1){
+		housePos = grid->getPosition(3, 11);
+		housePos[1] = 27;
+		housePointer->setPosition(housePos);
+		Ogre::Vector3 yoshPos = grid->getPosition(5, 11);
+		yoshPointer->setPosition(yoshPos[0], 0, yoshPos[2]);
+	}
+	else if (level == 2){
+		housePos = grid->getPosition(11, 11);
+		housePos[1] = 27;
+		housePointer->setPosition(housePos);
+		Ogre::Vector3 yoshPos = grid->getPosition(13, 11);
+		yoshPointer->setPosition(yoshPos[0], 0, yoshPos[2]);
+	}
+	else{
+		int row = rand()%18+1;
+		int col = rand()%18+1;
+		housePos = grid->getPosition(row, col);
+		housePos[1] = 27;
+		housePointer->setPosition(housePos);
+		Ogre::Vector3 yoshPos = grid->getPosition(row+2, col);
+		yoshPointer->setPosition(yoshPos[0], 0, yoshPos[2]);
+	}
+	Ogre::Vector3 robPos;
+	for(Robot* rob:RobotList){
+		do {
+			rob->restart();
+			robPos = grid->getPosition(rand()%20+1, rand()%20+1);
+		} while(housePointer->getPosition().distance(robPos) < 80);
+		//rob->setInitPos(robPos);
+		rob->setPosition(robPos[0], 0, robPos[2]);
+	}
+	houseHealth = 1.0;
+	startGame = true;
+	houseHealth = 1.0f;
+	gameOver = false;
+	mTrayMgr->destroyAllWidgetsInTray(OgreBites::TL_CENTER);
+	houseHUD->setProgress(houseHealth);
+	mTrayMgr->hideCursor();
 }
