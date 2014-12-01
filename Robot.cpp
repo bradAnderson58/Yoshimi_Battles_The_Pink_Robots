@@ -45,6 +45,8 @@ Robot::Robot(Ogre::SceneManager* SceneManager, std::string name, std::string fil
 	}
 
 	Ogre::ParticleSystem::setDefaultNonVisibleUpdateTimeout(5);  // set nonvisible timeout
+
+	//Rainbow Guns
 	ps = mSceneMgr->createParticleSystem(mBodyNode->getName() + "fountain", "Examples/PurpleFountain");
 	Ogre::SceneNode* mnode = mBodyNode->createChildSceneNode();
 	mnode->roll(Ogre::Degree(-90));
@@ -190,8 +192,6 @@ void Robot::updateAnimations(Ogre::Real deltaTime){
 			setAnimation(ANIM_NONE);
 		}
 	}
-	//transitions
-	//fadeAnimations(deltaTime);
 	
 }
 
@@ -268,6 +268,7 @@ void Robot::setAnimation(AnimID id, bool reset){
 	}
 }
 
+//Going around the house - don't go where there are already robots
 Ogre::Vector3 Robot::getSpecificPos(){
 	Ogre::Vector3 housePos = app->getHousePointer()->getPosition();
 	std::list<Robot*> robots = app->getRobotList();
@@ -276,11 +277,14 @@ Ogre::Vector3 Robot::getSpecificPos(){
 	std::list<Ogre::Vector3>::iterator oIter;
 
 	std::list<Robot*>::iterator rIter;
+
+	//Robots will go to a specific position based on a radius around the house
 	double angle = 0;
 	Ogre::Real c = cos(angle);
 	Ogre::Real s = sin(angle);
 	Ogre::Matrix3 rot(c,0,s,0,1,0,-s,0,c);
 
+	//Check if a position is occupied
 	for (rIter = robots.begin(); rIter != robots.end(); rIter++){
 		if ( !(*rIter)->notAtLocation()){
 			occupied.push_back((*rIter)->getPosition());
@@ -292,6 +296,8 @@ Ogre::Vector3 Robot::getSpecificPos(){
 	Ogre::Vector3 ret(0,0,0);
 	Ogre::Vector3 temp(0,0,0);
 	Ogre::Real dist = 0;
+
+	//random direction
 	bool addAngle = false;
 	if(rand() % 2 == 0){
 		addAngle = true;
@@ -303,7 +309,7 @@ Ogre::Vector3 Robot::getSpecificPos(){
 	ret[1] = 0;
 
 	do{
-		//for (oIter = occupied.begin(); oIter != occupied.end(); oIter++){
+		//for each position in the occupied list - check if its too close
 		for (Ogre::Vector3 thing : occupied){
 			temp = thing - ret;
 			dist = temp.length();
@@ -311,6 +317,8 @@ Ogre::Vector3 Robot::getSpecificPos(){
 				tooClose = true;
 			}
 		}
+
+		//move the position around the circumference
 		if (tooClose){
 			if(goRight){
 				angle = -.1;
@@ -423,7 +431,10 @@ Ogre::Vector3 Robot::flockingNormal(){				//need to add stuff to gameapplication
 	return vel;
 }
 
+//Algorithm for fleeing robots
 Ogre::Vector3 Robot::flockingFlee(){
+
+	//run in the opposite direction of Yoshimi
 	Ogre::Vector3 yoshPos = app->getYoshimiPointer()->getPosition();
 	Ogre::Vector3 mPosition = mBodyNode->getPosition();
 	Ogre::Vector3 desired = (mPosition - yoshPos);
@@ -432,14 +443,17 @@ Ogre::Vector3 Robot::flockingFlee(){
 	desired[1] = 0;
 	/*Ogre::Vector3 steer = desired - mDirection;
 	steer[1] = 0;
-	steer += mDirection*/ //if you wanna make it impossible to catch the guy;
+	steer += mDirection*/							//if you wanna make it impossible to catch the guy;
 	return desired;
 }
+
+//Seek is opposite of flee
 Ogre::Vector3 Robot::flockingSeek(){
 	return flockingFlee() * -1;
 }
+
 Ogre::Vector3 Robot::flockingLeader(){
-	return Ogre::Vector3::ZERO;
+	return Ogre::Vector3::ZERO; //hasnt been implemented - no leader
 }
 
 //Here the robot reacts when hit by Yoshimi
@@ -476,14 +490,18 @@ void Robot::setFlyback(int velocity,Ogre::Vector3 dir){
 	gravity.z = 0;
 }
 
-//this probably didnt need to be its own method
+//do things when the robot dies
 void Robot::setDeath(){
+
+	//Tell other robots im dead - they will get angry
 	std::list<Robot*> robots = app->getRobotList();
 	for (Robot* guy : robots){
 		if (getPosition().distance(guy->getPosition()) < 20){
 			guy->setAngry();
 		}
 	}
+
+	//flags
 	atLocation = false;
 	setAnimation(DIE);
 	dead = true;
@@ -538,14 +556,19 @@ void Robot::checkBoundaryCollision(){
 	}
 }
 
+//Checkcollisions between robots
 void Robot::RobotCollisions(){
 	Ogre::Vector3 temp(0,0,0);
 	Ogre::Vector3 pos = mBodyNode->getPosition();
 	Ogre::Vector3 rPos(0,0,0);
 	std::list<Robot*> robots = app->getRobotList();
+
+	//For each other robot - check if robots are too close to each other
 	for (Robot* rob : robots){
 		if (rob != this && rob->notDead()){
 			rPos = rob->getPosition();
+
+			//collision - move me over
 			if (mBodyNode->getPosition().distance(rob->getPosition()) < 3){
 				temp = pos - rPos;
 				temp.normalise();
@@ -557,6 +580,7 @@ void Robot::RobotCollisions(){
 	}
 }
 
+//Reset the robot for restarting the level
 void Robot::restart(){
 	mBodyNode->setPosition(initPos);
 	state = NORMAL;
