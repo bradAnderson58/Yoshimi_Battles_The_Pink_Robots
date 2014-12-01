@@ -176,7 +176,7 @@ GameApplication::loadEnv()
 			inputfile >> c;			// read one char at a time
 			buf = c + '\0';			// convert char to string
 			rent = objs[buf];		// find cooresponding object or agent
-			if (rent != NULL)		// it might not be an agent or object
+			if (rent != NULL){		// it might not be an agent or object
 				if (rent->agent)	// if it is an agent...
 				{
 					// Use subclasses instead!
@@ -198,13 +198,23 @@ GameApplication::loadEnv()
 				{
 					if (rent->filename == "tudorhouse.mesh"){
 						String work = getNewName();
-						temp = grid->loadObject(work, rent->filename, i, rent->y, j, rent->scale);
-						housePointer = mSceneMgr->getSceneNode(work);
+						//temp = grid->loadObject(work, rent->filename, i, rent->y, j, rent->scale);
+						//housePointer = mSceneMgr->getSceneNode(work);
+
+						Entity *ent = mSceneMgr->createEntity(work, rent->filename);
+						
+						housePointer = mSceneMgr->getRootSceneNode()->createChildSceneNode(work,
+							grid->getPosition(i,j));
+						housePointer->attachObject(ent);
+						housePointer->setScale(rent->scale, rent->scale, rent->scale);
+						housePointer->translate(0,rent->y,0);
 					}
-					//The temp object holds a pointer to the barrel node, which we need for bounding box access
-					temp = grid->loadObject(getNewName(), rent->filename, i, rent->y, j, rent->scale);
-					
+					else {//The temp object holds a pointer to the barrel node, which we need for bounding box access
+						temp = grid->loadObject(getNewName(), rent->filename, i, rent->y, j, rent->scale);
+					}
 				}
+					
+			}
 			else // not an object or agent
 			{
 				if (c == 'w') // create a wall
@@ -467,8 +477,6 @@ bool GameApplication::keyReleased( const OIS::KeyEvent &arg )
 
 bool GameApplication::mouseMoved( const OIS::MouseEvent &arg )
 {
-	//std::cout << arg.state.X << std::endl;
-	//std::cout << arg.state.Y << std::endl;
 
 	if (startGame) yoshPointer->rotationCode(arg);
 	
@@ -508,7 +516,6 @@ bool GameApplication::mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButto
 {
 	if (id == OIS::MB_Right) bRMouseDown = false;
 	else if (id == OIS::MB_Left) bLMouseDown = false;
-	std::cout << "release me!?" << std::endl;
 	if (mTrayMgr->injectMouseUp(arg, id)) return true;
     return true;
 }
@@ -552,7 +559,6 @@ void GameApplication::createGUI(void)
 
 void GameApplication::buttonHit(OgreBites::Button* b)
 {
-	std::cout << "Gots here" << std::endl;
 	if (b->getName() == "ClickMe")
 	{
 		//Delete start GUI and start game
