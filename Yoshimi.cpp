@@ -36,17 +36,7 @@ Yoshimi::Yoshimi(Ogre::SceneManager* SceneManager, std::string name, std::string
 	//set up the position of the attackNode
 	mAttackNode->setPosition(0.0f ,100.0f, -100.0f);
 	mAttackNode->setVisible(false);
-	//mAttackNode->showBoundingBox(true);											//for testing  Attack box
-	
-	//use this to check animations if needed
-	/*Ogre::AnimationStateSet* aSet = mBodyEntity->getAllAnimationStates();
-	Ogre::AnimationStateIterator iter = mBodyEntity->getAllAnimationStates()->getAnimationStateIterator();
-	while (iter.hasMoreElements())
-	{
-		Ogre::AnimationState *a = iter.getNext();
-		std::string s = a->getAnimationName();
-		std::cout << s << std::endl;
-	}*/
+	//mAttackNode->showBoundingBox(true);					//for testing  Attack box
 	
 	setupAnimations();
 }
@@ -70,7 +60,6 @@ void Yoshimi::updateLocomote(Ogre::Real deltaTime){
 
 	//use direction for forward and backward
 	mDirection = mBodyNode->getOrientation() * Ogre::Vector3::UNIT_Z;
-	this->collisionWalls();
 	//90 degrees from mDirection for right and left
 	q.FromAngleAxis(Ogre::Radian(M_PI) / 2, Ogre::Vector3(0,1,0));
 	Ogre::Vector3 side = q*mDirection;
@@ -90,12 +79,12 @@ void Yoshimi::updateLocomote(Ogre::Real deltaTime){
 			if (yoshAnim != STEALTH) setAnimation(STEALTH);
 		}
 	}
-
+	//border wall coordinates
 	float maxX = app->getXmax() * 10 -5;
 	float maxZ = app->getZmax() * 10 -5;
 
 	Ogre::Vector3 newPos = translator + getPosition();
-
+	//doing collisions with border walls
 	if (newPos[0] > maxX -.5){
 		newPos[0] = maxX -.5;
 	}
@@ -109,12 +98,15 @@ void Yoshimi::updateLocomote(Ogre::Real deltaTime){
 		newPos[2] = -maxZ + .5;
 	}
 
+	//doing collisions with the house
+	//house xcoords -18 from center to 15
+	//house z coords -18 from center to 18
 	Ogre::Vector3 hp = app->getHousePointer()->getPosition();
 	hp[1] = 0;
 	if (newPos.distance(hp) < 25){
 		float xvals = newPos[0] - hp[0];
 		float zvals = newPos[2] - hp[2];
-		if ((xvals < 15 && xvals > -18) && (zvals < 18 && zvals > -15)){
+		if ((xvals < 15 && xvals > -18) && (zvals < 18 && zvals > -18)){
 			if (abs(xvals) > abs(zvals)){
 				if(xvals > 0){
 					newPos[0] = hp[0] + 15;
@@ -128,7 +120,7 @@ void Yoshimi::updateLocomote(Ogre::Real deltaTime){
 					newPos[2] = hp[2] + 18;
 				}
 				else{
-					newPos[2] = hp[2] - 15;
+					newPos[2] = hp[2] - 18;
 				}
 			}
 		}
@@ -273,14 +265,18 @@ void Yoshimi::checkHits(char attack){
 
 }
 
+//check collisions with robots
+//robots will push yoshimi out of the way
 void Yoshimi::collisionRobots(){
 	std::list<Robot*> robots = app->getRobotList();
 
 	Ogre::Vector3 temp(0,0,0);
 	Ogre::Vector3 pos = mBodyNode->getPosition();
 	Ogre::Vector3 rPos;
+	//loop through all robots
 	for(Robot* r : robots){
 		rPos = r->getPosition();
+		//checking distance between robot and yoshimi. 2 is the magic number between robot and yoshimi
 		if (pos.distance(rPos) < 2){
 			temp = pos - rPos;
 			temp.normalise();
@@ -290,11 +286,11 @@ void Yoshimi::collisionRobots(){
 		}
 	}
 }
-
+//moved into updatelocomote
 void Yoshimi::collisionWalls(){
 	
 }
-
+//reset yoshimi to the initial position and reset initialize variables
 void Yoshimi::restart(){
 	mBodyNode->setPosition(initPos);
 	mBodyNode->yaw(Ogre::Radian(M_PI));
