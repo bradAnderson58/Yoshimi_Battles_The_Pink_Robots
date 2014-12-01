@@ -188,8 +188,7 @@ void Robot::updateAnimations(Ogre::Real deltaTime){
 	if (robAnim != ANIM_NONE){
 		mAnims[robAnim]->addTime(deltaTime * 1);
 		if (mAnims[robAnim]->hasEnded()){
-			std::cout << "END" << std::endl;
-			setAnimation(ANIM_NONE);
+			setAnimation(ANIM_NONE);			//robot slumps when hit, but then reset to none
 		}
 	}
 	
