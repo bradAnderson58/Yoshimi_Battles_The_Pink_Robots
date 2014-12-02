@@ -14,6 +14,7 @@ class GameApplication : public BaseApplication
 private:
 	Agent* agent; // store a pointer to the character
 	std::list<Robot*> RobotList; //now a list of robots
+	Ogre::Vector3 houseInitPos;
 
 	Yoshimi* yoshPointer;	//This is our heroic savior, Yoshimi!
 	Ogre::SceneNode* housePointer;		//point to the location of the house COM

@@ -208,6 +208,7 @@ GameApplication::loadEnv()
 						housePointer->attachObject(ent);
 						housePointer->setScale(rent->scale, rent->scale, rent->scale);
 						housePointer->translate(0,rent->y,0);
+						houseInitPos = housePointer->getPosition();
 					}
 					else {//The temp object holds a pointer to the barrel node, which we need for bounding box access
 						temp = grid->loadObject(getNewName(), rent->filename, i, rent->y, j, rent->scale);
@@ -669,6 +670,7 @@ void GameApplication::restartLevel(){
 	for(Robot* r : RobotList){
 		r->restart();
 	}
+	housePointer->setPosition(houseInitPos);
 	yoshPointer->restart();
 	houseHealth = 1.0;
 	startGame = true;
