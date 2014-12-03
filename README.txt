@@ -1,29 +1,43 @@
-FISH IN A BARREL - README
+YOSHIMI BATTLES THE PINK ROBOTS - README
 
-Fish in a barrel is a game where you shoot fish into a barrel.
+Your name is Yoshimi, and you're a blackbelt in karate
 
 How to play:
-	The player will notice a slider at the top of the screen labelled 'Trajectory' which is sliding back and forth,
-	 this is the angle the fish will be fired at.  When the player hits spacebar, they set the angle for the fish.
+	The player controls Yoshimi thusly:
+		WASD moves Yoshimi.  W and D move forward and back.  S and D 'strafe' Yoshimi side to side
+		Moving the mouse will rotate Yoshimi (These are essentially Skyrim controls)
+		Spacebar is for Jumping (This serves no purpose)
+		Left click executes Sweet Judo Sword Attack
+		Right click executes Ultimate Super Kick
 
-	After selecting the angle, the slider label will change to 'Velocity', and the player will now select the velocity
-	 of the fish.  As before, pressing spacebar will select the current value on the slider
+	The pink robots will attempt to attack your house, which you must defend by hitting them with your attacks
 
-	Now that trajectory and velocity have been established, it is time to fire the fish.  Again, pressing spacebar.
+	Win Condition:  A level is completed by killing all the robots
+	Lose Condition: A level is lost if your house's health reaches 0
 
-	If the fish hits the barrel, the success counter in the upper right will be incremented, and the player will also
-	 be rewarded will a flash of green on the screen.  Missing produces a flash of red.  The player may continue firing
-	 fish for as long as their patience allows.
+How it Meets the Requirements:
 
-	Win Condition:  Get more successes than your friends.
+	The player interacts with the game world
+	There are way more than three game states:
+		Robots have multiple game states
+		The level itself has game states
+		Yoshimi's attacks and movement are state based
+	The characters are animated
+	Robots spawn randomly
+	There are three levels, and level three loops infinitely - so there are technically infinte levels!
+	Robots use Boid flocking algorithm to group together for attack formation
+	Collision detection: between Yoshimi and Robots, Robots and Robots, Yoshimi and Walls, Robots and Walls, Yoshimi 	attack and Robots
+	Physics: Robots get knocked back by attacks, fly through the air, and bounce off walls
+	Health bar for house displays state of the house.  GUI pop-ups for win and lose conditions.  Rainbow guns show		which Robot is attacking the house and present time.
+	This game is different than anything you have ever seen!
+	Game can be fairly challenging in later levels.  I think its fun.
+	Got them 60 fps.  And now with comments!
+	Pics and Video in folder labeled as such.
 
-How to Test:
+Who did what:
 
-	You can test it by playing.  For testers who may have issues hitting the barrel (and thus testing success), there
-	 are two lines which can be uncommented in the spacebar handler which will automatically set the velocity and
-	 trajectory values to a successful fish firing, regardless of when they hit the spacebar.
-	
-	To view bounding boxes, there is also a line in the Grid loadObject method to display barrel boundingBox and
-	 a line in the shoot method of Agent to see boundingBox of the fish.
+	Brad did Yoshimi attacking and movement.  Robot kicking and Rainbow Guns.  GUI stuffs, and other random tasks
+	Kevin did Robot flocking, fleeing, seeking, and state management.  Also surrounding of house and other random tasks
 
-	All the camera movement code has been removed for simplicity.  The player cannot move the camera.
+	For break down on a per-commit bases, please refer to:
+		https://github.com/bradAnderson58/Yoshimi_Battles_The_Pink_Robots/commits/master
